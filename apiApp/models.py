@@ -53,5 +53,27 @@ class thaniyans_and_vazhi_thirunamams(models.Model):
 class vanamamalai_education(models.Model):
     pass
 
+
+class gallery_album(models.Model):
+    album_name = models.TextField()
+
+class gallery_sub_album(models.Model):
+    album_name = models.TextField()
+    sub_album_name = models.TextField()
+    sub_album_image = models.TextField()
+    sub_album_details = models.TextField()
+
+class gallery_details(models.Model):
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+
+class gallery_youtube(models.Model):
+    title = models.TextField()
+    url = models.TextField()
+
 class gallery(models.Model):
-    pass
+    album_name = models.TextField()
+    sub_album_name = models.TextField()
+    image = models.TextField()
+    name = models.TextField()
+    details = models.TextField()
