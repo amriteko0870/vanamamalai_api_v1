@@ -13,6 +13,7 @@ urlpatterns = [
     path('vn_temple',views.vn_temple,name='vn_temple'),
     path('gallery_page',views.gallery_page,name='gallery_page'),
     path('sub_album_page',views.sub_album_page,name='sub_album_page'),
+    path('all_sub_album_page',views.all_sub_album_page,name='all_sub_album_page'),
     
     
     

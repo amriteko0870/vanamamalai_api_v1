@@ -56,7 +56,6 @@ def sideBar(request,format=None):
            }
     navbar.append(home)
     vn_temple = {
-                #  "call_link":"vn_temple",
                  "main_link":{
                               "link_name": "Vanamamalai Temple",
                               "link_path": "/sub_page/vanamamalai_temple/temple_history",
@@ -212,153 +211,29 @@ def sub_album_page(request,format=None):
     res['content'] = content
     return Response(res)
 
+@api_view(['POST'])
+def all_sub_album_page(request,format=None):
+    album_id  = request.data['album_id']
+    album_name = gallery_album.objects.filter(id = album_id).values().last()['album_name']
+    res = {}
 
+    obj = gallery_details.objects.values().last()
+    banner = {
+                "heading": obj['banner_heading'],
+                'image': obj['banner_image'] 
+             }
+    res['banner'] = banner
 
+    res['title'] = album_name
 
-# def index(request):
-#     album_name = 'album 2'
-#     sub_album_name = '2022'
-#     image = 'media/gallery/image.png'
-#     image_name = 'image name'
-#     details = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime assumenda rerum iusto atque, mollitia ab ipsum sapiente debitis blanditiis voluptatum eligendi'
+    res['id'] = album_id
 
-#     for i in range(5):
-#         data = gallery(
-#                         album_name = album_name,
-#                         sub_album_name = sub_album_name,
-#                         image = image,
-#                         name = image_name + ' ' + str(i+1),
-#                         details = details,
-#         )
-#         data.save()
-#     return HttpResponse('Hello')
+    content = gallery_sub_album.objects.filter(album_name = album_name)\
+                                       .annotate(
+                                                 sub_heading = F('sub_album_name'),
+                                                 image = F('sub_album_image')
+                                                ).values('sub_heading','image')
 
-# @api_view(['GET'])
-# def index(request,format=None):
-#     landing_page.objects.
-#     landingPageData = [
-#     {
-#       'id': "landing_section_01",
-#       'h1': "SRI VANAMAMALAI (THOTHADRI) MUTT",
-#       'h2': "SRI VANACHALA MAHAMUNI PARAMPARA",
-#       'p': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean pellentesque quam vitae ornare porta. Vivamus pretium eleifend risus laoreet pretium. Ut sit amet finibus metus, nec cursus lacus.",
-#       'img': ["static/img/first_section_image.png"],
-#       'read_link': '',
-#       'yt_link': '', 
-#       'file_link': '',
-#       'yt_title': '',#
-#       'file_title': '',#
-#       'layout': "hero",
-#     },
+    res['content'] = content
 
-#     {
-#       'id': "landing_section_02",
-#       'h1': "Sri Vanamamalai divyadesam",
-#       'h2': "Sri varamangai nachiyar sametha sri deivanayaga perumal",
-#       'p': "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet.",
-#       'img': [""],
-#       'read_link': '',#
-#       'yt_link': '',#
-#       'file_link': '',#
-#       'yt_title': '',#
-#       'file_title': '',#
-#       'layout': "event",
-#     },
-
-#     {
-#       'id': "landing_section_03",
-#       'h1': "SRI VANAMAMALAI DIVYADESAM",
-#       'h2': "SRI VARAMANGAI NACHIYAR SAMETHA SRI DEIVANAYAGA PERUMAL",
-#       'p': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean pellentesque quam vitae ornare porta. Vivamus pretium eleifend risus laoreet pretium. Ut sit amet finibus metus, nec cursus lacus.",
-#       'img': ["static/img/second_section_img_1.png","static/img/second_section_img_2.png"],
-#       'read_link': '',
-#       'yt_link': '',
-#       'file_link': '',
-#       'yt_title': '',
-#       'file_title': '',
-#       'layout': "two_images",
-#     },
-
-#     {
-#       'id': "landing_section_04",
-#       'h1': "'PONNADIKKAL JEEYAR' WHO ESTABLISHED THE VANAMAMALAI MUTT",
-#       'h2': '',
-#       'p': "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quod odio dicta, temporibus magnam ea eius quas iure illo consequuntur nostrum tempore laudantium, blanditiis, minima possimus velit? Id perspiciatis, dolores reiciendis aspernatur voluptate quod consectetur rerum. Quos, voluptatem. Harum error quis sapiente itaque, magnam dolores tenetur repellat labore adipisci ab at numquam iure accusantium minima reprehenderit dolorum est, eum soluta nesciunt facere temporibus. Adipisci debitis rerum assumenda necessitatibus iure inventore temporibus minus distinctio sed omnis culpa magni ducimus, similique ab esse natus officia facilis earum accusantium maxime officiis! Labore animi impedit fuga recusandae alias, voluptate repellendus suscipit consequatur assumenda quidem qui et sunt facere rerum doloribus beatae mollitia asperiores cumque nesciunt vitae nemo corporis blanditiis nobis? Error dolores quas",
-#       'img': ["statc/img/ zthird_section_image.png"],
-#       'read_link': '',
-#       'yt_link': '',
-#       'file_link': '',
-#       'yt_title': "WATCH PONNADIKKAL JEEYAR'S PRAPATHI & MANGALASASANAM",
-#       'file_title': "THANIYAN AND VAZHI THIRUNAMAM",
-#       'layout': "right_image",
-#     },
-
-#     {
-#       'id': "landing_section_05",
-#       'h1': "SRI MADHURAKAVI VANAMAMALAI RAMANUJA JEEYAR SWAMI - 31ST",
-#       'h2': '',
-#       'p': "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum accusantium magnam commodi explicabo hic laborum quae, id repellat. Magni nobis rerum inventore delectus in molestiae? Est amet commodi atque nam delectus. Ipsum molestiae ipsa consequuntur inventore quibusdam repellat praesentium consequatur harum facere cupiditate soluta iste, non quos voluptas dignissimos velit ut incidunt eligendi aspernatur quidem aperiam odio, nisi quam doloremque? Ad eos incidunt distinctio ut facilis quidem hic error quaerat? Facilis quod assumenda inventore distinctio molestias. Rerum, aliquid. Aliquid molestiae fuga necessitatibus expedita, officiis possimus rem debitis doloremque repellendus officia, iusto nobis ullam sequi dolorem et impedit doloribus accusamus. Fugit quisquam delectus ratione modi quos illum cupiditate, totam enim officia consequuntur et repellat. Provident unde at eius odit molestias commodi quod, ipsum perferendis dicta! Nesciunt, eligendi asperiores ab cupiditate eum doloremque obcaecati aperiam vero inventore corporis laborum",
-#       'img': ["static/img/forth_section_image.png"],
-#       'read_link': '',
-#       'yt_link': '',
-#       'file_link': '',
-#       'yt_title': "WATCH PONNADIKKAL JEEYAR'S PRAPATHI & MANGALASASANAM",
-#       'file_title': "THANIYAN AND VAZHI THIRUNAMAM",
-#       'layout': "right_image",
-#     },
-
-#     {
-#       'id': "landing_section_06",
-#       'h1': "SRI VANAMAMALAI DIVYADESAM",
-#       'h2': "SRI VARAMANGAI NACHIYAR SAMETHA SRI DEIVANAYAGA PERUMAL",
-#       'p': "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia molestiae eveniet vel, qui voluptatibus magnam quis. Aliquid iusto nobis, dignissimos minima suscipit, aliquam eum accusantium quam distinctio ipsa explicabo blanditiis veritatis accusamus inventore cupiditate, quia porro. Qui animi vitae ipsum, laborum explicabo autem blanditiis sit ad nisi cupiditate facere, provident amet cum reiciendis veritatis aperiam possimus consectetur! Fugiat tempore qui perferendis veritatis quibusdam odit rem, labore placeat facere",
-#       'img': ["static/img/fithsection_image_1.png","static/img/fithsection_image_2.png"],
-#       'read_link': '',
-#       'yt_link': '',
-#       'file_link': '',
-#       'yt_title': '',
-#       'file_title': '',
-#       'layout': "two_images",
-#     },
-#     ]
-#     for i in range(len(landingPageData)):
-#         data = landing_page(order = i+1,
-#                             h1 = landingPageData[i]['h1'],
-#                             h2 = landingPageData[i]['h2'],
-#                             p = landingPageData[i]['p'],
-#                             img = landingPageData[i]['img'],
-#                             read_link = landingPageData[i]['read_link'],
-#                             yt_link = landingPageData[i]['yt_link'],
-#                             file_link = landingPageData[i]['file_link'],
-#                             yt_title = landingPageData[i]['yt_title'],
-#                             file_title = landingPageData[i]['file_title'],
-#                             layout = landingPageData[i]['layout'])
-#         data.save()
-#         print(i+1)
-#         print(landingPageData[i]['h1'])
-#         print(landingPageData[i]['h2'])
-#         print(landingPageData[i]['p'])
-#         print(landingPageData[i]['img'])
-#         print(landingPageData[i]['read_link'])
-#         print(landingPageData[i]['yt_link'])
-#         print(landingPageData[i]['file_link'])
-#         print(landingPageData[i]['yt_title'])
-#         print(landingPageData[i]['file_title'])
-#         print(landingPageData[i]['layout'])
-#         print()
-
-        
-#     return HttpResponse('Hello world')
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return Response(res)
