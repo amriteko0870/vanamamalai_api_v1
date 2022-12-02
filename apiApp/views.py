@@ -26,6 +26,10 @@ from rest_framework.response import Response
 #----------------------------models---------------------------------------------------
 from apiApp.models import landing_page,vanamamalai_temple
 from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
+from apiApp.models import jeeyars
+
+#-----------------------------extra -----------------------------------------------------
+from apiApp.extra import navbar_extra_data,other_temple_extra,branches_extra,ponnadikkal_jeeyar_extra
 
 @api_view(['GET'])
 def landingPage(request,format=None):
@@ -69,6 +73,18 @@ def sideBar(request,format=None):
     vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_temple['sub_links'] = vn_sub_links
     navbar.append(vn_temple)
+    
+    d = navbar_extra_data()
+    for i in d:
+        navbar.append(i)
+    
+    jeeyar = {
+                'main_link': {
+                            'link_name': "Jeeyars",
+                            'link_path': "/jeeyars",
+                            }
+              }
+    navbar.append(jeeyar)
 
     gallery = {
                 'main_link': {
@@ -237,3 +253,60 @@ def all_sub_album_page(request,format=None):
     res['content'] = content
 
     return Response(res)
+
+
+@api_view(['GET'])
+def jeeyars_parampara(request,format=None):
+    res = {}
+    res['title'] = "Jeeyar Paramapara"
+    jeeyar = jeeyars.objects.values('id','image','name','prefix','start_date','end_date','jeeyar_no','jeeyar_no_suffix')
+    res['jeeyars'] = jeeyar
+    return Response(res)
+
+
+@api_view(['POST'])
+def other_temple(request,format=None):
+    id = request.data['id']
+    res = other_temple_extra(int(id))
+    return Response(res)
+
+@api_view(['POST'])
+def branches(request,format=None):
+    id = request.data['id']
+    res = branches_extra(int(id))
+    return Response(res)
+
+@api_view(['POST'])
+def ponnadikkal_jeeyar(request,format=None):
+    res = ponnadikkal_jeeyar_extra()
+    return Response(res)
+
+
+
+@api_view(['GET'])
+def index(request):
+    # l = [['Shri Ramanuja alias Sri Udayavar','AD','1017','',1,'st'],
+    #     ['Shri Manavala Maamunigal','AD','1370','',2,'nd'],
+    #     ['Ponnadikkal Jeeyar','AD','1447','1482','3','rd'],
+    #     ['Sri Chendalangara Ramanuja Jeer Swami','AD','1502','1520',4,'th'],
+    #     ['Sri Rengappa Ramanuja Swami','AD','1520','1586',5,'th']]
+
+    # for i in l:
+    #     print('name :',i[0])
+    #     print('prefix :',i[1])
+    #     print('start_date :',i[2])
+    #     print('end_date :',i[3])
+    #     print('jeeyar_no :',i[4])
+    #     print('jeeyar_no_sufix :',i[5])
+    #     print()
+    #     data = jeeyars(
+    #                                 name = i[0],
+    #                                 prefix = i[1],
+    #                                 start_date = i[2],
+    #                                 end_date = i[3],
+    #                                 jeeyar_no = i[4],
+    #                                 jeeyar_no_suffix = i[5],
+    #                                 image = 'media/img/jeeyars/sample.svg',
+    #                             )
+    #     data.save()
+    return Response('sample')

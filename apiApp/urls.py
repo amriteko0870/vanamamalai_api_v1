@@ -14,9 +14,17 @@ urlpatterns = [
     path('gallery_page',views.gallery_page,name='gallery_page'),
     path('sub_album_page',views.sub_album_page,name='sub_album_page'),
     path('all_sub_album_page',views.all_sub_album_page,name='all_sub_album_page'),
+    path('jeeyars',views.jeeyars_parampara,name='jeeyars_parampara'),
+
+    path('other_temple',views.other_temple,name='other_temple'),
+    path('branches',views.branches,name='branches'),
+    path('ponnadikkal_jeeyar',views.ponnadikkal_jeeyar,name='ponnadikkal_jeeyar'),
     
     
     
-    # path('',views.index,name='index'),
+    
+    
+    
+    path('',views.index,name='index'),
 
 ] +static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

@@ -44,8 +44,7 @@ class vanamamalai_mutt_branches(models.Model):
 class ponnadikkal_jeeyar(models.Model):
     pass
 
-class jeeyar_parampara(models.Model):
-    pass
+
 
 class thaniyans_and_vazhi_thirunamams(models.Model):
     pass
@@ -77,3 +76,12 @@ class gallery(models.Model):
     image = models.TextField()
     name = models.TextField()
     details = models.TextField()
+
+class jeeyars(models.Model):
+    name = models.TextField()
+    prefix = models.TextField()
+    start_date = models.TextField()
+    end_date = models.TextField()
+    jeeyar_no_suffix = models.TextField()
+    image = models.TextField()
+    jeeyar_no = models.IntegerField()
