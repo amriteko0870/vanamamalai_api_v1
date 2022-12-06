@@ -1,22 +1,5 @@
 def navbar_extra_data():
-    d = [{
-        "main_link": {
-            "link_name": "Other Temple",
-            "link_path": "/sub_page/other_temple/1"
-        },
-        "sub_links": [
-            {
-                "id": 1,
-                "sub_link_name": "Mela Thiruvengadamudyaan",
-                "sub_link_path": "/sub_page/other_temple/1"
-            },
-            {
-                "id": 2,
-                "sub_link_name": "Therku Thiruvengadamudayan",
-                "sub_link_path": "/sub_page/other_temple/2"
-            },
-        ]
-    },
+    d = [
 
     {
     "main_link": {

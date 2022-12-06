@@ -22,21 +22,23 @@ class vanamamalai_temple(models.Model):
     content_title = models.TextField()
     content_subtitle = models.TextField()
     content_image = models.TextField()
-    tab1_heading = models.TextField()
-    tab1_desc = models.TextField()
-    tab1_schema = models.TextField()
-    tab2_heading = models.TextField()
-    tab2_desc = models.TextField()
-    tab2_schema = models.TextField()
-    tab3_heading = models.TextField()
-    tab3_desc = models.TextField()
-    tab3_schema = models.TextField()
-    tab4_heading = models.TextField()
-    tab4_desc = models.TextField()
-    tab4_schema = models.TextField()
+
+class vanamamalai_temple_tab(models.Model):
+    temple_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
 
 class vanamamalai_other_temple(models.Model):
-    pass
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+    content_title = models.TextField()
+    content_subtitle = models.TextField()
+    content_image = models.TextField()
+
+class vanamamalai_other_temple_tab(models.Model):
+    temple_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
 
 class vanamamalai_mutt_branches(models.Model):
     pass
@@ -85,3 +87,12 @@ class jeeyars(models.Model):
     jeeyar_no_suffix = models.TextField()
     image = models.TextField()
     jeeyar_no = models.IntegerField()
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+
+
+class jeeyars_tab(models.Model):
+    jeeyar_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
+

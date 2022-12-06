@@ -7,6 +7,7 @@ import re
 from operator import itemgetter 
 import os
 import random
+import simplejson as json
 #-------------------------Django Modules---------------------------------------------
 from django.http import Http404, HttpResponse, JsonResponse,FileResponse
 from django.shortcuts import render
@@ -24,9 +25,10 @@ from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework.response import Response
 
 #----------------------------models---------------------------------------------------
-from apiApp.models import landing_page,vanamamalai_temple
+from apiApp.models import landing_page,vanamamalai_temple,vanamamalai_temple_tab
 from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
-from apiApp.models import jeeyars
+from apiApp.models import jeeyars,jeeyars_tab
+from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
 
 #-----------------------------extra -----------------------------------------------------
 from apiApp.extra import navbar_extra_data,other_temple_extra,branches_extra,ponnadikkal_jeeyar_extra
@@ -62,7 +64,6 @@ def sideBar(request,format=None):
     vn_temple = {
                  "main_link":{
                               "link_name": "Vanamamalai Temple",
-                              "link_path": "/sub_page/vanamamalai_temple/temple_history",
                              },
                 }
     vn_sub_links = vanamamalai_temple.objects.annotate(
@@ -73,6 +74,22 @@ def sideBar(request,format=None):
     vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_temple['sub_links'] = vn_sub_links
     navbar.append(vn_temple)
+
+    
+
+    vn_other_temple = {
+                 "main_link":{
+                              "link_name": "Other Temple",
+                             },
+                }
+    vn_sub_links = vanamamalai_other_temple.objects.annotate(
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_page/other_temple/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path')
+    vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_other_temple['sub_links'] = vn_sub_links
+    navbar.append(vn_other_temple)
     
     d = navbar_extra_data()
     for i in d:
@@ -100,64 +117,32 @@ def vn_temple(request,format=None):
     id = request.data['id']
     res = {}
     obj = vanamamalai_temple.objects.filter(id = id).values().last()
+    tab = vanamamalai_temple_tab.objects.filter(temple_id = id).values()
+
     banner = {
-                'heading':'Vanamamalai Temple',
-                'image': obj['banner_image']
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
              }
     res['banner'] = banner
 
     content = {
-                'title':obj['content_title'],
-                'sub_title':obj['content_subtitle'],
-                'image':obj['content_image']
+                'title': obj['content_title'],
+                'sub_title': obj['content_subtitle'] ,
+                'image': obj['content_image'],
               }
     res['content'] = content
-
     tab_data = []
-    
-    tab1 = {
-            'name':obj['tab1_heading']
-           }
-    tab1_content = []
-    for i in range(len(obj['tab1_desc'].split('|'))):
-        tab1_content.append({'data':obj['tab1_desc'].split('|')[i],'type':obj['tab1_schema'].split('|')[i]})
-    tab1['content'] = tab1_content
-    
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
 
-    tab2 = {
-            'name':obj['tab2_heading']
-           }
-    tab2_content = []
-    for i in range(len(obj['tab2_desc'].split('|'))):
-        tab2_content.append({'data':obj['tab2_desc'].split('|')[i],'type':obj['tab2_schema'].split('|')[i]})
-    tab2['content'] = tab2_content
-
-
-    tab3 = {
-            'name':obj['tab3_heading']
-           }
-    tab3_content = []
-    for i in range(len(obj['tab3_desc'].split('|'))):
-        tab3_content.append({'data':obj['tab3_desc'].split('|')[i],'type':obj['tab3_schema'].split('|')[i]})
-    tab3['content'] = tab3_content
-
-
-    tab4 = {
-            'name':obj['tab4_heading']
-           }
-    tab4_content = []
-    for i in range(len(obj['tab4_desc'].split('|'))):
-        tab4_content.append({'data':obj['tab4_desc'].split('|')[i],'type':obj['tab4_schema'].split('|')[i]})
-    tab4['content'] = tab4_content
-
-    tab_data.append(tab1)
-    tab_data.append(tab2)
-    tab_data.append(tab3)
-    tab_data.append(tab4)
+        tab_data.append(tab_content)
 
     res['tab_data'] = tab_data
-
     return Response(res)
+
 
 @api_view(['GET'])
 def gallery_page(request,format=None):
@@ -259,15 +244,76 @@ def all_sub_album_page(request,format=None):
 def jeeyars_parampara(request,format=None):
     res = {}
     res['title'] = "Jeeyar Paramapara"
+    res['call_link'] = "jeeyars_details"
     jeeyar = jeeyars.objects.values('id','image','name','prefix','start_date','end_date','jeeyar_no','jeeyar_no_suffix')
     res['jeeyars'] = jeeyar
     return Response(res)
 
+@api_view(['POST'])
+def jeeyars_details(request,format=None):
+    id = request.data['id']
+    res = {}
+    obj = jeeyars.objects.filter(id = id).values().last()
+    tab = jeeyars_tab.objects.filter(jeeyar_id = id).values()
+
+    banner = {
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
+             }
+    res['banner'] = banner
+
+    sub_title = obj['start_date']+" "+obj['prefix'] +" to "+obj['end_date'] if obj['end_date'] != "" else obj['start_date']+" "+obj['prefix']
+    content = {
+                'title': obj['name'],
+                'sub_title': sub_title ,
+                'image': obj['image'],
+                'jeeyar_no':str(obj['jeeyar_no'])+obj['jeeyar_no_suffix']
+              }
+    res['content'] = content
+
+    tab_data = []
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+
+        tab_data.append(tab_content)
+
+    res['tab_data'] = tab_data
+
+    return Response(res)
 
 @api_view(['POST'])
 def other_temple(request,format=None):
     id = request.data['id']
-    res = other_temple_extra(int(id))
+    res = {}
+    obj = vanamamalai_other_temple.objects.filter(id = id).values().last()
+    tab = vanamamalai_other_temple_tab.objects.filter(temple_id = id).values()
+
+    banner = {
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
+             }
+    res['banner'] = banner
+
+    content = {
+                'title': obj['content_title'],
+                'sub_title': obj['content_subtitle'] ,
+                'image': obj['content_image'],
+              }
+    res['content'] = content
+    
+    tab_data = []
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+
+        tab_data.append(tab_content)
+
+    res['tab_data'] = tab_data
     return Response(res)
 
 @api_view(['POST'])
@@ -281,32 +327,193 @@ def ponnadikkal_jeeyar(request,format=None):
     res = ponnadikkal_jeeyar_extra()
     return Response(res)
 
-
-
 @api_view(['GET'])
 def index(request):
-    # l = [['Shri Ramanuja alias Sri Udayavar','AD','1017','',1,'st'],
-    #     ['Shri Manavala Maamunigal','AD','1370','',2,'nd'],
-    #     ['Ponnadikkal Jeeyar','AD','1447','1482','3','rd'],
-    #     ['Sri Chendalangara Ramanuja Jeer Swami','AD','1502','1520',4,'th'],
-    #     ['Sri Rengappa Ramanuja Swami','AD','1520','1586',5,'th']]
+    j = [
+        {
+            "id": 1,
+            "image": "media/img/jeeyars/sample.svg",
+            "name": "Shri Ramanuja alias Sri Udayavar",
+            "prefix": "AD",
+            "start_date": "1017",
+            "end_date": "",
+            "jeeyar_no": 1,
+            "jeeyar_no_suffix": "st"
+        },
+        {
+            "id": 2,
+            "image": "media/img/jeeyars/sample.svg",
+            "name": "Shri Manavala Maamunigal",
+            "prefix": "AD",
+            "start_date": "1370",
+            "end_date": "",
+            "jeeyar_no": 2,
+            "jeeyar_no_suffix": "nd"
+        },
+        {
+            "id": 3,
+            "image": "media/img/jeeyars/sample.svg",
+            "name": "Ponnadikkal Jeeyar",
+            "prefix": "AD",
+            "start_date": "1447",
+            "end_date": "1482",
+            "jeeyar_no": 3,
+            "jeeyar_no_suffix": "rd"
+        },
+        {
+            "id": 4,
+            "image": "media/img/jeeyars/sample.svg",
+            "name": "Sri Chendalangara Ramanuja Jeer Swami",
+            "prefix": "AD",
+            "start_date": "1502",
+            "end_date": "1520",
+            "jeeyar_no": 4,
+            "jeeyar_no_suffix": "th"
+        },
+        {
+            "id": 5,
+            "image": "media/img/jeeyars/sample.svg",
+            "name": "Sri Rengappa Ramanuja Swami",
+            "prefix": "AD",
+            "start_date": "1520",
+            "end_date": "1586",
+            "jeeyar_no": 5,
+            "jeeyar_no_suffix": "th"
+        }
+    ]
+    a = [
+        {
+            "name": "About",
+            "content": [
+                {
+                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "name": "Place",
+            "content": [
+                {
+                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "name": "AchAryan/Sishya",
+            "content": [
+                {
+                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "name": "Works",
+            "content": [
+                {
+                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
+                    "type": "text"
+                }
+            ]
+        }
+    ]
 
-    # for i in l:
-    #     print('name :',i[0])
-    #     print('prefix :',i[1])
-    #     print('start_date :',i[2])
-    #     print('end_date :',i[3])
-    #     print('jeeyar_no :',i[4])
-    #     print('jeeyar_no_sufix :',i[5])
-    #     print()
-    #     data = jeeyars(
-    #                                 name = i[0],
-    #                                 prefix = i[1],
-    #                                 start_date = i[2],
-    #                                 end_date = i[3],
-    #                                 jeeyar_no = i[4],
-    #                                 jeeyar_no_suffix = i[5],
-    #                                 image = 'media/img/jeeyars/sample.svg',
-    #                             )
-    #     data.save()
+    jeeyars.objects.all().delete()
+    jeeyars_tab.objects.all().delete()
+    for i in j:
+        data = jeeyars(
+                        name = i['name'],
+                        prefix = i['prefix'],
+                        start_date = i['start_date'],
+                        end_date = i['end_date'],
+                        jeeyar_no_suffix = i['jeeyar_no_suffix'],
+                        image = i['image'],
+                        jeeyar_no = i['jeeyar_no']
+                       )
+        data.save()
+        for k in a :
+            name = k['name']
+            content = k['content']
+            json_content = json.dumps(content)
+            data1 = jeeyars_tab(
+                                    jeeyar_id = data.id,
+                                    tab_heading = name,
+                                    tab_desc = json_content,
+                                )
+            data1.save()
+
     return Response('sample')
+
+# @api_view(['GET'])
+# def index(request):
+#     # vanamamalai_temple.objects.all().delete()
+#     # vanamamalai_temple_tab.objects.all().delete()
+#     banner_image = 'media/img/vanamamalai_temple/banner.png'
+#     banner_heading = 'Other Temple'
+#     content_title = 'Therku Thiruvengadamudayan' #Mela Thiruvengadamudyaan
+#     content_subtitle = 'Lorem Ipsum'
+#     content_image = 'media/img/vanamamalai_temple/10.png'
+
+#     data = vanamamalai_other_temple(
+#                         banner_image = banner_image,
+#                         banner_heading = banner_heading,
+#                         content_title = content_title,
+#                         content_subtitle = content_subtitle,
+#                         content_image = content_image,
+#     )
+#     data.save()
+#     print('################  id : ',data.id)
+#     a = [
+#         {
+#             "name": "Details",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "History",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "Events",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "How to Reach",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
+#                     "type": "text"
+#                 }
+#             ]
+#         }
+#     ]
+#     for i in a:
+#         name = i['name']
+#         content = i['content']
+#         json_content = json.dumps(content)
+#         data1 = vanamamalai_other_temple_tab(
+#                                 temple_id = data.id,
+#                                 tab_heading = name,
+#                                 tab_desc = json_content,
+#                               )
+#         data1.save()
+#     return Response('sample')
+
+
+
