@@ -18,8 +18,10 @@ urlpatterns = [
 
     path('other_temple',views.other_temple,name='other_temple'),
     path('branches',views.branches,name='branches'),
-    path('ponnadikkal_jeeyar',views.ponnadikkal_jeeyar,name='ponnadikkal_jeeyar'),
+    path('ponnadikkal_jeeyar',views.ponnadikkal_jeeyars,name='ponnadikkal_jeeyar'),
     path('jeeyars_details',views.jeeyars_details,name='jeeyars_details'),
+    path('vn_education',views.vn_education,name='vn_education'),
+    
     
     
     

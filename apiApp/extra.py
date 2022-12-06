@@ -1,26 +1,5 @@
 def navbar_extra_data():
     d = [
-
-    {
-    "main_link": {
-        "link_name": "Branches",
-        "link_path": "/sub_page/branches/1"
-    },
-    "sub_links": [
-        {
-            "id": 1,
-            "sub_link_name": "Vanamamalai (nanguneri)",
-            "sub_link_path": "/sub_page/branches/1"
-        },
-        {
-            "id": 2,
-            "sub_link_name": "Mannarkudi",
-            "sub_link_path": "/sub_page/branches/2"
-        },
-    ]
-    },
-
-
     {
     "main_link": {
         "link_name": "Ponnadikkal Jeeyar",

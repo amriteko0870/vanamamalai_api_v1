@@ -15,7 +15,7 @@ class landing_page(models.Model):
     file_title = models.CharField(max_length=2000,blank=True)
     layout = models.CharField(max_length=2000,blank=True)
 
-
+#-------------------------------------------------------------------------------
 class vanamamalai_temple(models.Model):
     banner_image = models.TextField()
     banner_heading = models.TextField()
@@ -28,6 +28,7 @@ class vanamamalai_temple_tab(models.Model):
     tab_heading = models.TextField()
     tab_desc = models.TextField()
 
+#----------------------------------------------------------------------------------
 class vanamamalai_other_temple(models.Model):
     banner_image = models.TextField()
     banner_heading = models.TextField()
@@ -40,21 +41,50 @@ class vanamamalai_other_temple_tab(models.Model):
     tab_heading = models.TextField()
     tab_desc = models.TextField()
 
+#-----------------------------------------------------------------------------------
 class vanamamalai_mutt_branches(models.Model):
-    pass
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+    content_title = models.TextField()
+    content_subtitle = models.TextField()
+    content_image = models.TextField()
 
+class vanamamalai_mutt_branches_tab(models.Model):
+    branch_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
+
+#------------------------------------------------------------------------------------
 class ponnadikkal_jeeyar(models.Model):
-    pass
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+    content_title = models.TextField()
+    content_subtitle = models.TextField()
+    content_image = models.TextField()
 
+class ponnadikkal_jeeyar_tab(models.Model):
+    jeeyar_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
 
-
+#------------------------------------------------------------------------------------
 class thaniyans_and_vazhi_thirunamams(models.Model):
     pass
 
+#------------------------------------------------------------------------------------
 class vanamamalai_education(models.Model):
-    pass
+    banner_image = models.TextField()
+    banner_heading = models.TextField()
+    content_title = models.TextField()
+    content_subtitle = models.TextField()
+    content_image = models.TextField()
 
+class vanamamalai_education_tab(models.Model):
+    education_id = models.IntegerField()
+    tab_heading = models.TextField()
+    tab_desc = models.TextField()
 
+#------------------------------------------------------------------------------------
 class gallery_album(models.Model):
     album_name = models.TextField()
 
@@ -79,6 +109,7 @@ class gallery(models.Model):
     name = models.TextField()
     details = models.TextField()
 
+#---------------------------------------------------------------------
 class jeeyars(models.Model):
     name = models.TextField()
     prefix = models.TextField()

@@ -29,6 +29,9 @@ from apiApp.models import landing_page,vanamamalai_temple,vanamamalai_temple_tab
 from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
 from apiApp.models import jeeyars,jeeyars_tab
 from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
+from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_tab
+from apiApp.models import ponnadikkal_jeeyar,ponnadikkal_jeeyar_tab
+from apiApp.models import vanamamalai_education,vanamamalai_education_tab
 
 #-----------------------------extra -----------------------------------------------------
 from apiApp.extra import navbar_extra_data,other_temple_extra,branches_extra,ponnadikkal_jeeyar_extra
@@ -90,11 +93,29 @@ def sideBar(request,format=None):
     vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_other_temple['sub_links'] = vn_sub_links
     navbar.append(vn_other_temple)
+
+
+    vn_branches = {
+                 "main_link":{
+                              "link_name": "Branches",
+                             },
+                }
+    vn_sub_links = vanamamalai_mutt_branches.objects.annotate(
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_page/branches/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path')
+    vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_branches['sub_links'] = vn_sub_links
+    navbar.append(vn_branches)
     
-    d = navbar_extra_data()
-    for i in d:
-        navbar.append(i)
-    
+    pon_jeeyar = {
+                    "main_link": {
+                                    "link_name": "Ponnadikkal Jeeyar",
+                                    "link_path": "/sub_page/ponnadikkal_jeeyar/1"
+                                 },
+                 }
+    navbar.append(pon_jeeyar)           
     jeeyar = {
                 'main_link': {
                             'link_name': "Jeeyars",
@@ -102,6 +123,20 @@ def sideBar(request,format=None):
                             }
               }
     navbar.append(jeeyar)
+
+    vn_edu = {
+                 "main_link":{
+                              "link_name": "Education",
+                             },
+                }
+    vn_sub_links = vanamamalai_education.objects.annotate(
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_page/vn_education/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path')
+    vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_edu['sub_links'] = vn_sub_links
+    navbar.append(vn_edu)
 
     gallery = {
                 'main_link': {
@@ -319,68 +354,237 @@ def other_temple(request,format=None):
 @api_view(['POST'])
 def branches(request,format=None):
     id = request.data['id']
-    res = branches_extra(int(id))
+    res = {}
+    obj = vanamamalai_mutt_branches.objects.filter(id = id).values().last()
+    tab = vanamamalai_mutt_branches_tab.objects.filter(branch_id = id).values()
+
+    banner = {
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
+             }
+    res['banner'] = banner
+
+    content = {
+                'title': obj['content_title'],
+                'sub_title': obj['content_subtitle'] ,
+                'image': obj['content_image'],
+              }
+    res['content'] = content
+    
+    tab_data = []
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+
+        tab_data.append(tab_content)
+
+    res['tab_data'] = tab_data
+    return Response(res)
+
+
+@api_view(['POST'])
+def vn_education(request,format=None):
+    id = request.data['id']
+    res = {}
+    obj = vanamamalai_education.objects.filter(id = id).values().last()
+    tab = vanamamalai_education_tab.objects.filter(education_id = id).values()
+
+    banner = {
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
+             }
+    res['banner'] = banner
+
+    content = {
+                'title': obj['content_title'],
+                'sub_title': obj['content_subtitle'] ,
+                'image': obj['content_image'],
+              }
+    res['content'] = content
+    
+    tab_data = []
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+
+        tab_data.append(tab_content)
+
+    res['tab_data'] = tab_data
     return Response(res)
 
 @api_view(['POST'])
-def ponnadikkal_jeeyar(request,format=None):
-    res = ponnadikkal_jeeyar_extra()
+def ponnadikkal_jeeyars(request,format=None):
+    res = {}
+    obj = ponnadikkal_jeeyar.objects.values().last()
+    tab = ponnadikkal_jeeyar_tab.objects.values()
+
+    banner = {
+                'heading': obj['banner_heading'],
+                'image': obj['banner_image'],
+             }
+    res['banner'] = banner
+
+    content = {
+                'title': obj['content_title'],
+                'sub_title': obj['content_subtitle'] ,
+                'image': obj['content_image'],
+              }
+    res['content'] = content
+    
+    tab_data = []
+    jsonDec = json.decoder.JSONDecoder()
+    for i in tab:
+        tab_content = {}
+        tab_content['name'] = i['tab_heading']
+        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+
+        tab_data.append(tab_content)
+
+    res['tab_data'] = tab_data
     return Response(res)
 
+# @api_view(['GET'])
+# def index(request):
+#     j = [
+#         {
+#             "id": 1,
+#             "image": "media/img/jeeyars/sample.svg",
+#             "name": "Shri Ramanuja alias Sri Udayavar",
+#             "prefix": "AD",
+#             "start_date": "1017",
+#             "end_date": "",
+#             "jeeyar_no": 1,
+#             "jeeyar_no_suffix": "st"
+#         },
+#         {
+#             "id": 2,
+#             "image": "media/img/jeeyars/sample.svg",
+#             "name": "Shri Manavala Maamunigal",
+#             "prefix": "AD",
+#             "start_date": "1370",
+#             "end_date": "",
+#             "jeeyar_no": 2,
+#             "jeeyar_no_suffix": "nd"
+#         },
+#         {
+#             "id": 3,
+#             "image": "media/img/jeeyars/sample.svg",
+#             "name": "Ponnadikkal Jeeyar",
+#             "prefix": "AD",
+#             "start_date": "1447",
+#             "end_date": "1482",
+#             "jeeyar_no": 3,
+#             "jeeyar_no_suffix": "rd"
+#         },
+#         {
+#             "id": 4,
+#             "image": "media/img/jeeyars/sample.svg",
+#             "name": "Sri Chendalangara Ramanuja Jeer Swami",
+#             "prefix": "AD",
+#             "start_date": "1502",
+#             "end_date": "1520",
+#             "jeeyar_no": 4,
+#             "jeeyar_no_suffix": "th"
+#         },
+#         {
+#             "id": 5,
+#             "image": "media/img/jeeyars/sample.svg",
+#             "name": "Sri Rengappa Ramanuja Swami",
+#             "prefix": "AD",
+#             "start_date": "1520",
+#             "end_date": "1586",
+#             "jeeyar_no": 5,
+#             "jeeyar_no_suffix": "th"
+#         }
+#     ]
+#     a = [
+#         {
+#             "name": "About",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "Place",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "AchAryan/Sishya",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+#                     "type": "text"
+#                 }
+#             ]
+#         },
+#         {
+#             "name": "Works",
+#             "content": [
+#                 {
+#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
+#                     "type": "text"
+#                 }
+#             ]
+#         }
+#     ]
+
+#     jeeyars.objects.all().delete()
+#     jeeyars_tab.objects.all().delete()
+#     for i in j:
+#         data = jeeyars(
+#                         name = i['name'],
+#                         prefix = i['prefix'],
+#                         start_date = i['start_date'],
+#                         end_date = i['end_date'],
+#                         jeeyar_no_suffix = i['jeeyar_no_suffix'],
+#                         image = i['image'],
+#                         jeeyar_no = i['jeeyar_no']
+#                        )
+#         data.save()
+#         for k in a :
+#             name = k['name']
+#             content = k['content']
+#             json_content = json.dumps(content)
+#             data1 = jeeyars_tab(
+#                                     jeeyar_id = data.id,
+#                                     tab_heading = name,
+#                                     tab_desc = json_content,
+#                                 )
+#             data1.save()
+
+#     return Response('sample')
+
 @api_view(['GET'])
-def index(request):
-    j = [
-        {
-            "id": 1,
-            "image": "media/img/jeeyars/sample.svg",
-            "name": "Shri Ramanuja alias Sri Udayavar",
-            "prefix": "AD",
-            "start_date": "1017",
-            "end_date": "",
-            "jeeyar_no": 1,
-            "jeeyar_no_suffix": "st"
-        },
-        {
-            "id": 2,
-            "image": "media/img/jeeyars/sample.svg",
-            "name": "Shri Manavala Maamunigal",
-            "prefix": "AD",
-            "start_date": "1370",
-            "end_date": "",
-            "jeeyar_no": 2,
-            "jeeyar_no_suffix": "nd"
-        },
-        {
-            "id": 3,
-            "image": "media/img/jeeyars/sample.svg",
-            "name": "Ponnadikkal Jeeyar",
-            "prefix": "AD",
-            "start_date": "1447",
-            "end_date": "1482",
-            "jeeyar_no": 3,
-            "jeeyar_no_suffix": "rd"
-        },
-        {
-            "id": 4,
-            "image": "media/img/jeeyars/sample.svg",
-            "name": "Sri Chendalangara Ramanuja Jeer Swami",
-            "prefix": "AD",
-            "start_date": "1502",
-            "end_date": "1520",
-            "jeeyar_no": 4,
-            "jeeyar_no_suffix": "th"
-        },
-        {
-            "id": 5,
-            "image": "media/img/jeeyars/sample.svg",
-            "name": "Sri Rengappa Ramanuja Swami",
-            "prefix": "AD",
-            "start_date": "1520",
-            "end_date": "1586",
-            "jeeyar_no": 5,
-            "jeeyar_no_suffix": "th"
-        }
-    ]
+def index(format=None):
+    # vanamamalai_education.objects.all().delete()
+    # vanamamalai_temple_tab.objects.all().delete()
+    banner_image = 'media/img/vanamamalai_temple/banner.png'
+    banner_heading = 'Education'
+    content_title = 'Sri Ramanuja Matriculation' #Mela Thiruvengadamudyaan
+    content_subtitle = 'Lorem Ipsum'
+    content_image = 'media/img/vanamamalai_temple/10.png'
+
+    data = vanamamalai_education(
+                        banner_image = banner_image,
+                        banner_heading = banner_heading,
+                        content_title = content_title,
+                        content_subtitle = content_subtitle,
+                        content_image = content_image,
+    )
+    data.save()
+    print('################  id : ',data.id)
     a = [
         {
             "name": "About",
@@ -392,7 +596,7 @@ def index(request):
             ]
         },
         {
-            "name": "Place",
+            "name": "Admission",
             "content": [
                 {
                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
@@ -401,7 +605,7 @@ def index(request):
             ]
         },
         {
-            "name": "AchAryan/Sishya",
+            "name": "Curriculum",
             "content": [
                 {
                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
@@ -410,7 +614,7 @@ def index(request):
             ]
         },
         {
-            "name": "Works",
+            "name": "Faculties",
             "content": [
                 {
                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
@@ -419,101 +623,15 @@ def index(request):
             ]
         }
     ]
-
-    jeeyars.objects.all().delete()
-    jeeyars_tab.objects.all().delete()
-    for i in j:
-        data = jeeyars(
-                        name = i['name'],
-                        prefix = i['prefix'],
-                        start_date = i['start_date'],
-                        end_date = i['end_date'],
-                        jeeyar_no_suffix = i['jeeyar_no_suffix'],
-                        image = i['image'],
-                        jeeyar_no = i['jeeyar_no']
-                       )
-        data.save()
-        for k in a :
-            name = k['name']
-            content = k['content']
-            json_content = json.dumps(content)
-            data1 = jeeyars_tab(
-                                    jeeyar_id = data.id,
-                                    tab_heading = name,
-                                    tab_desc = json_content,
-                                )
-            data1.save()
-
+    for i in a:
+        name = i['name']
+        content = i['content']
+        json_content = json.dumps(content)
+        data1 = vanamamalai_education_tab(
+                                education_id = data.id,
+                                tab_heading = name,
+                                tab_desc = json_content,
+                              )
+        data1.save()
     return Response('sample')
-
-# @api_view(['GET'])
-# def index(request):
-#     # vanamamalai_temple.objects.all().delete()
-#     # vanamamalai_temple_tab.objects.all().delete()
-#     banner_image = 'media/img/vanamamalai_temple/banner.png'
-#     banner_heading = 'Other Temple'
-#     content_title = 'Therku Thiruvengadamudayan' #Mela Thiruvengadamudyaan
-#     content_subtitle = 'Lorem Ipsum'
-#     content_image = 'media/img/vanamamalai_temple/10.png'
-
-#     data = vanamamalai_other_temple(
-#                         banner_image = banner_image,
-#                         banner_heading = banner_heading,
-#                         content_title = content_title,
-#                         content_subtitle = content_subtitle,
-#                         content_image = content_image,
-#     )
-#     data.save()
-#     print('################  id : ',data.id)
-#     a = [
-#         {
-#             "name": "Details",
-#             "content": [
-#                 {
-#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-#                     "type": "text"
-#                 }
-#             ]
-#         },
-#         {
-#             "name": "History",
-#             "content": [
-#                 {
-#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-#                     "type": "text"
-#                 }
-#             ]
-#         },
-#         {
-#             "name": "Events",
-#             "content": [
-#                 {
-#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-#                     "type": "text"
-#                 }
-#             ]
-#         },
-#         {
-#             "name": "How to Reach",
-#             "content": [
-#                 {
-#                     "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
-#                     "type": "text"
-#                 }
-#             ]
-#         }
-#     ]
-#     for i in a:
-#         name = i['name']
-#         content = i['content']
-#         json_content = json.dumps(content)
-#         data1 = vanamamalai_other_temple_tab(
-#                                 temple_id = data.id,
-#                                 tab_heading = name,
-#                                 tab_desc = json_content,
-#                               )
-#         data1.save()
-#     return Response('sample')
-
-
 
