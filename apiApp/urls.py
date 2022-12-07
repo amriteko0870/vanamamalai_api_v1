@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from . import views
-
+from . import user_views as u_views
 urlpatterns = [
     #-------------------Filters------------------------------------
     path('landingPage',views.landingPage,name='landingPage'),
@@ -26,7 +26,7 @@ urlpatterns = [
     
     
     
-    
+    path('login',u_views.login,name='login'),
     
     
     path('',views.index,name='index'),
