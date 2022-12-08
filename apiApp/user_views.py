@@ -27,7 +27,7 @@ from rest_framework.response import Response
 #------------------------start you views----------------------------------------------
 
 @api_view(['POST'])
-def login(request,format=None):
+def login(request,format=ModuleNotFoundError):
     username = request.data['username']
     password = request.data['password']
 

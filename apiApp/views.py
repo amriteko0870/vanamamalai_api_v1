@@ -53,99 +53,6 @@ def landingPage(request,format=None):
                    })
 
 
-@api_view(['GET'])
-def sideBar(request,format=None):
-    navbar = []
-
-    home = {
-            "main_link": {
-                        "link_name": "Home",
-                        "link_path": "/",
-                       },
-           }
-    navbar.append(home)
-    vn_temple = {
-                 "main_link":{
-                              "link_name": "Vanamamalai Temple",
-                             },
-                }
-    vn_sub_links = vanamamalai_temple.objects.annotate(
-                                                        sub_link_name = F('content_title'),
-                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_page/vn_temple/'),Cast('id',CharField()),output_field=CharField())
-    ).values('id','sub_link_name','sub_link_path')
-    vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
-    vn_temple['sub_links'] = vn_sub_links
-    navbar.append(vn_temple)
-
-    
-
-    vn_other_temple = {
-                 "main_link":{
-                              "link_name": "Other Temple",
-                             },
-                }
-    vn_sub_links = vanamamalai_other_temple.objects.annotate(
-                                                        sub_link_name = F('content_title'),
-                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_page/other_temple/'),Cast('id',CharField()),output_field=CharField())
-    ).values('id','sub_link_name','sub_link_path')
-    vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
-    vn_other_temple['sub_links'] = vn_sub_links
-    navbar.append(vn_other_temple)
-
-
-    vn_branches = {
-                 "main_link":{
-                              "link_name": "Branches",
-                             },
-                }
-    vn_sub_links = vanamamalai_mutt_branches.objects.annotate(
-                                                        sub_link_name = F('content_title'),
-                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_page/branches/'),Cast('id',CharField()),output_field=CharField())
-    ).values('id','sub_link_name','sub_link_path')
-    vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
-    vn_branches['sub_links'] = vn_sub_links
-    navbar.append(vn_branches)
-    
-    pon_jeeyar = {
-                    "main_link": {
-                                    "link_name": "Ponnadikkal Jeeyar",
-                                    "link_path": "/sub_page/ponnadikkal_jeeyar/1"
-                                 },
-                 }
-    navbar.append(pon_jeeyar)           
-    jeeyar = {
-                'main_link': {
-                            'link_name': "Jeeyars",
-                            'link_path': "/jeeyars",
-                            }
-              }
-    navbar.append(jeeyar)
-
-    vn_edu = {
-                 "main_link":{
-                              "link_name": "Education",
-                             },
-                }
-    vn_sub_links = vanamamalai_education.objects.annotate(
-                                                        sub_link_name = F('content_title'),
-                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_page/vn_education/'),Cast('id',CharField()),output_field=CharField())
-    ).values('id','sub_link_name','sub_link_path')
-    vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
-    vn_edu['sub_links'] = vn_sub_links
-    navbar.append(vn_edu)
-
-    gallery = {
-                'main_link': {
-                            'link_name': "Gallery",
-                            'link_path': "/gallery",
-                            }
-              }
-    navbar.append(gallery)
-    return Response(navbar)
 
 @api_view(['POST'])
 def vn_temple(request,format=None):
@@ -568,70 +475,70 @@ def ponnadikkal_jeeyars(request,format=None):
 
 @api_view(['GET'])
 def index(format=None):
-    # vanamamalai_education.objects.all().delete()
-    # vanamamalai_temple_tab.objects.all().delete()
-    banner_image = 'media/img/vanamamalai_temple/banner.png'
-    banner_heading = 'Education'
-    content_title = 'Sri Ramanuja Matriculation' #Mela Thiruvengadamudyaan
-    content_subtitle = 'Lorem Ipsum'
-    content_image = 'media/img/vanamamalai_temple/10.png'
+    # # vanamamalai_education.objects.all().delete()
+    # # vanamamalai_temple_tab.objects.all().delete()
+    # banner_image = 'media/img/vanamamalai_temple/banner.png'
+    # banner_heading = 'Education'
+    # content_title = 'Sri Vanachala Vidhya Peetam' #Mela Thiruvengadamudyaan
+    # content_subtitle = 'Lorem Ipsum'
+    # content_image = 'media/img/vanamamalai_temple/10.png'
 
-    data = vanamamalai_education(
-                        banner_image = banner_image,
-                        banner_heading = banner_heading,
-                        content_title = content_title,
-                        content_subtitle = content_subtitle,
-                        content_image = content_image,
-    )
-    data.save()
-    print('################  id : ',data.id)
-    a = [
-        {
-            "name": "About",
-            "content": [
-                {
-                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-                    "type": "text"
-                }
-            ]
-        },
-        {
-            "name": "Admission",
-            "content": [
-                {
-                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-                    "type": "text"
-                }
-            ]
-        },
-        {
-            "name": "Curriculum",
-            "content": [
-                {
-                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
-                    "type": "text"
-                }
-            ]
-        },
-        {
-            "name": "Faculties",
-            "content": [
-                {
-                    "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
-                    "type": "text"
-                }
-            ]
-        }
-    ]
-    for i in a:
-        name = i['name']
-        content = i['content']
-        json_content = json.dumps(content)
-        data1 = vanamamalai_education_tab(
-                                education_id = data.id,
-                                tab_heading = name,
-                                tab_desc = json_content,
-                              )
-        data1.save()
+    # data = vanamamalai_education(
+    #                     banner_image = banner_image,
+    #                     banner_heading = banner_heading,
+    #                     content_title = content_title,
+    #                     content_subtitle = content_subtitle,
+    #                     content_image = content_image,
+    # )
+    # data.save()
+    # print('################  id : ',data.id)
+    # a = [
+    #     {
+    #         "name": "About",
+    #         "content": [
+    #             {
+    #                 "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+    #                 "type": "text"
+    #             }
+    #         ]
+    #     },
+    #     {
+    #         "name": "Admission",
+    #         "content": [
+    #             {
+    #                 "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+    #                 "type": "text"
+    #             }
+    #         ]
+    #     },
+    #     {
+    #         "name": "Curriculum",
+    #         "content": [
+    #             {
+    #                 "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+    #                 "type": "text"
+    #             }
+    #         ]
+    #     },
+    #     {
+    #         "name": "Faculties",
+    #         "content": [
+    #             {
+    #                 "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
+    #                 "type": "text"
+    #             }
+    #         ]
+    #     }
+    # ]
+    # for i in a:
+    #     name = i['name']
+    #     content = i['content']
+    #     json_content = json.dumps(content)
+    #     data1 = vanamamalai_education_tab(
+    #                             education_id = data.id,
+    #                             tab_heading = name,
+    #                             tab_desc = json_content,
+    #                           )
+    #     data1.save()
     return Response('sample')
 

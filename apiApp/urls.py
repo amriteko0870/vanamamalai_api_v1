@@ -6,10 +6,14 @@ from django.conf.urls.static import static
 
 from . import views
 from . import user_views as u_views
+from . import sidebar_views as s_views
+
 urlpatterns = [
     #-------------------Filters------------------------------------
+    path('sideBar',s_views.sideBar,name='sideBar'),
+
+
     path('landingPage',views.landingPage,name='landingPage'),
-    path('sideBar',views.sideBar,name='sideBar'),
     path('vn_temple',views.vn_temple,name='vn_temple'),
     path('gallery_page',views.gallery_page,name='gallery_page'),
     path('sub_album_page',views.sub_album_page,name='sub_album_page'),
