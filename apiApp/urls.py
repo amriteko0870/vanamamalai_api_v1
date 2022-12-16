@@ -11,6 +11,7 @@ from . import sidebar_views as s_views
 urlpatterns = [
     #-------------------Filters------------------------------------
     path('sideBar',s_views.sideBar,name='sideBar'),
+    path('sideBarAdmin',s_views.sideBarAdmin,name='sideBarAdmin'),
 
 
     path('landingPage',views.landingPage,name='landingPage'),

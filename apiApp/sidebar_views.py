@@ -145,3 +145,116 @@ def sideBar(request,format=None):
               }
     navbar.append(gallery)
     return Response(navbar)
+
+
+# -------------------------------------- admin sidebar --------------------------------------------------
+
+@api_view(['GET'])
+def sideBarAdmin(request,format=None):
+    navbar = []
+
+    home = {
+            "main_link": {
+                        "link_name": "Home",
+                        "link_path": "/admin/home_edit",
+                        "link_code":'/admin/home_edit'
+                       },
+           }
+    navbar.append(home)
+    vn_temple = {
+                 "main_link":{
+                              "link_name": "Vanamamalai Temple",
+                              "link_code": "vn_temple_edit"
+                             },
+                }
+    vn_sub_links = vanamamalai_temple.objects.annotate(
+                                                        link_code = V('vn_temple_edit'),
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_admin_page/vn_temple_edit/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path','link_code')
+    vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_temple['sub_links'] = vn_sub_links
+    navbar.append(vn_temple)
+
+    
+
+    vn_other_temple = {
+                 "main_link":{
+                              "link_name": "Other Temple",
+                              "link_code": "other_temple_edit"
+
+                             },
+                }
+    vn_sub_links = vanamamalai_other_temple.objects.annotate(
+                                                        link_code = V('other_temple_edit'),
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_admin_page/other_temple_edit/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path','link_code')
+    vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_other_temple['sub_links'] = vn_sub_links
+    navbar.append(vn_other_temple)
+
+
+    vn_branches = {
+                 "main_link":{
+                              "link_name": "Branches",
+                              "link_code": "branches_edit"
+                             },
+                }
+    vn_sub_links = vanamamalai_mutt_branches.objects.annotate(
+                                                        link_code = V('branches_edit'),
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_admin_page/branches_edit/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path','link_code')
+    vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_branches['sub_links'] = vn_sub_links
+    navbar.append(vn_branches)
+    
+    pon_jeeyar = {
+                    "main_link": {
+                                    "link_name": "Ponnadikkal Jeeyar",
+                                    "link_path": "/sub_page/ponnadikkal_jeeyar_edit/1",
+                                    "link_code": "ponnadikkal_jeeyar_edit"
+
+                                 },
+                 }
+    navbar.append(pon_jeeyar)           
+    jeeyar = {
+                'main_link': {
+                            'link_name': "Jeeyars",
+                            'link_path': "/jeeyars_edit",
+                            "link_code": "/jeeyars_edit"
+
+                            }
+              }
+    navbar.append(jeeyar)
+
+    vn_edu = {
+                 "main_link":{
+                              "link_name": "Education",
+                              "link_code": "vn_education_edit"
+                              
+                             },
+                }
+    vn_sub_links = vanamamalai_education.objects.annotate(
+                                                        link_code = V('vn_education'),
+                                                        sub_link_name = F('content_title'),
+                                                        # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
+                                                        sub_link_path = Concat(V('/sub_admin_page/vn_education_edit/'),Cast('id',CharField()),output_field=CharField())
+    ).values('id','sub_link_name','sub_link_path','link_code')
+    vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    vn_edu['sub_links'] = vn_sub_links
+    navbar.append(vn_edu)
+
+    gallery = {
+                'main_link': {
+                            'link_name': "Gallery",
+                            'link_path': "/gallery_edit",
+                            "link_code": "/gallery_edit"
+                            }
+              }
+    navbar.append(gallery)
+    return Response(navbar)
