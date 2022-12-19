@@ -152,6 +152,16 @@ def sideBar(request,format=None):
 @api_view(['GET'])
 def sideBarAdmin(request,format=None):
     navbar = []
+    
+    dashboard = {
+            "main_link": {
+                        "link_name": "Dashboard",
+                        "link_path": "/admin/dashboard",
+                        "link_code":'/admin/dashboard'
+                       },
+           }
+    navbar.append(dashboard)
+
 
     home = {
             "main_link": {
@@ -161,6 +171,8 @@ def sideBarAdmin(request,format=None):
                        },
            }
     navbar.append(home)
+
+
     vn_temple = {
                  "main_link":{
                               "link_name": "Vanamamalai Temple",
