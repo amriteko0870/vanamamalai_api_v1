@@ -5,7 +5,7 @@ from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
 from apiApp.models import jeeyars,jeeyars_tab
 from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_tab
 from apiApp.models import vanamamalai_education,vanamamalai_education_tab
-
+from apiApp.models import rootPageStatus
 
 # Register your models here.
 
@@ -25,3 +25,4 @@ admin.site.register(vanamamalai_mutt_branches)
 admin.site.register(vanamamalai_mutt_branches_tab)
 admin.site.register(vanamamalai_education)
 admin.site.register(vanamamalai_education_tab)
+admin.site.register(rootPageStatus)

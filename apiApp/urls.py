@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 from . import views
 from . import user_views as u_views
 from . import sidebar_views as s_views
+import apiApp.admin_pages.admin_views as admin_views
 
 urlpatterns = [
     #-------------------Filters------------------------------------
@@ -28,7 +29,8 @@ urlpatterns = [
     path('vn_education',views.vn_education,name='vn_education'),
     
     
-    
+    path('adminDashboard',admin_views.adminDashboard,name='adminDashboard'),
+    path('home_page',admin_views.home_page,name='home_page'),
     
     
     path('login',u_views.login,name='login'),

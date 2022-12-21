@@ -72,7 +72,7 @@ def sideBar(request,format=None):
                               "link_code": "other_temple"
 
                              },
-                }
+                      }
     vn_sub_links = vanamamalai_other_temple.objects.annotate(
                                                         link_code = V('other_temple'),
                                                         sub_link_name = F('content_title'),

@@ -127,3 +127,8 @@ class jeeyars_tab(models.Model):
     tab_heading = models.TextField()
     tab_desc = models.TextField()
 
+# ------------------------------ Admin ---------------------------
+
+class rootPageStatus(models.Model):
+    title = models.TextField()
+    status = models.TextField()
