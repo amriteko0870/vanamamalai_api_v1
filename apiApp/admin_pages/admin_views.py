@@ -8,6 +8,8 @@ from operator import itemgetter
 import os
 import random
 import simplejson as json
+from PIL import Image  
+import PIL  
 #-------------------------Django Modules---------------------------------------------
 from django.http import Http404, HttpResponse, JsonResponse,FileResponse
 from django.shortcuts import render
@@ -109,40 +111,59 @@ def adminDashboard(request,format=None):
     return Response(res)
     
 
-@api_view(['GET'])
+@api_view(['GET','PUT'])
 def home_page(request,format=None):
-   obj = landing_page.objects.values()
-   res = {}
-   res['pageName'] = 'Home'
-   all_sections = []
-   for i in obj:
-      sub_dict = {}
-      sub_dict['section_name'] = 'Section '+str(i['order'])
-      section_data = [
-                        {
-                           'title':'Heading',
-                           'content':i['h1'],
-                           'type':'text'
-                        },
-                        {
-                           'title':'Sub Heading',
-                           'content':i['h2'],
-                           'type':'text'
-                        },
-                        {
-                           'title':'Brief Info',
-                           'content':i['p'],
-                           'type':'text'
-                        },
-                        {
-                           'title':'Cover Image',
-                           'content':i['img'].split('|'),
-                           'type':'image'
-                        },
-                     ]
-      sub_dict['section_data'] = section_data
-      all_sections.append(sub_dict)
-   
-   res['all_sections'] = all_sections
-   return Response(res)
+   if request.method == 'GET':
+      obj = landing_page.objects.values()
+      res = {}
+      res['pageName'] = 'Home'
+      mock_id = 1
+      all_sections = []
+      for i in obj:
+         sub_dict = {}
+         sub_dict['section_name'] = 'Section '+str(i['order'])
+         sub_dict['section_id'] = i['id']
+         section_data = [
+                           {  'id':mock_id,
+                              'title':'Heading',
+                              'content':i['h1'],
+                              'type':'text'
+                           },
+                           {
+                              'id':mock_id+1,
+                              'title':'Sub Heading',
+                              'content':i['h2'],
+                              'type':'text'
+                           },
+                           {
+                              'id':mock_id+2,
+                              'title':'Brief Info',
+                              'content':i['p'],
+                              'type':'text'
+                           },
+                           {
+                              'id':mock_id+3,
+                              'title':'Cover Image',
+                              'content':i['img'].split('|'),
+                              'type':'image',
+                              'update':False
+                           },
+                        ]
+         mock_id = mock_id + 4
+         sub_dict['section_data'] = section_data
+         all_sections.append(sub_dict)
+      
+      res['all_sections'] = all_sections
+      return Response(res)
+   if request.method == 'PUT':
+      data = request.data
+      for i in data['all_sections']:
+         obj = landing_page.objects.filter(id = i['section_id'])
+         print(i['section_data'])
+         h1 = i['section_data'][0]['content']
+         h2 = i['section_data'][1]['content']
+         p = i['section_data'][2]['content']
+         return Response(i)
+      # return Response(data['all_sections'])
+
 

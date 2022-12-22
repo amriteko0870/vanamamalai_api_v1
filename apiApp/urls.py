@@ -37,5 +37,6 @@ urlpatterns = [
     
     
     path('',views.index,name='index'),
-
+    path('image_check',views.image_check,name='image_check'),
+    
 ] +static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

@@ -8,6 +8,9 @@ from operator import itemgetter
 import os
 import random
 import simplejson as json
+import cv2 
+import os 
+
 #-------------------------Django Modules---------------------------------------------
 from django.http import Http404, HttpResponse, JsonResponse,FileResponse
 from django.shortcuts import render
@@ -542,3 +545,13 @@ def index(format=None):
     #     data1.save()
     return Response('sample')
 
+
+
+
+from django.core.files.storage import FileSystemStorage
+@api_view(['POST'])
+def image_check(request,format=None):
+    img = request.FILES['img']
+    fs = FileSystemStorage()
+    file = fs.save(img.name, img)
+    return Response(str(img))
