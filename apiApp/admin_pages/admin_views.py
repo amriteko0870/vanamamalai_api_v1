@@ -35,6 +35,10 @@ from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_ta
 from apiApp.models import ponnadikkal_jeeyar,ponnadikkal_jeeyar_tab
 from apiApp.models import vanamamalai_education,vanamamalai_education_tab
 from apiApp.models import rootPageStatus
+
+#--------------------------- extra -------------------------------------------------
+from apiApp.admin_pages.image_upload import image_upload
+
 #---------------------------------------- start your views -----------------------------------------------
 
 @api_view(['POST'])
@@ -156,14 +160,32 @@ def home_page(request,format=None):
       res['all_sections'] = all_sections
       return Response(res)
    if request.method == 'PUT':
+      # img = request.FILES['img']
+      # img_path = ''
+      # img_res = image_upload(img,img_path)
+      # return Response(img_res)
       data = request.data
       for i in data['all_sections']:
-         obj = landing_page.objects.filter(id = i['section_id'])
-         print(i['section_data'])
+         obj = landing_page.objects.filter(id = i['section_id']).values().last()
          h1 = i['section_data'][0]['content']
          h2 = i['section_data'][1]['content']
          p = i['section_data'][2]['content']
+         image = i['section_data'][3]['content']
+         updated_image_array = []
+         if i['section_data'][3]['update']:
+            print('Helloooooooooooooooo')
+            for j in range(len(image)):
+               if str(image[j]).startswith('media/img/'):
+                  updated_image_array.append(str(image[j]))
+               else:
+                  img = j
+                  img_path = 'img/'
+                  new_image = image_upload(img,img_path)
+                  updated_image_array.append('media/img/'+new_image)
+         else:
+            updated_image_array = image
+
          return Response(i)
-      # return Response(data['all_sections'])
+      return Response(data['all_sections'])
 
 

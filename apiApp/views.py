@@ -548,10 +548,3 @@ def index(format=None):
 
 
 
-from django.core.files.storage import FileSystemStorage
-@api_view(['POST'])
-def image_check(request,format=None):
-    img = request.FILES['img']
-    fs = FileSystemStorage()
-    file = fs.save(img.name, img)
-    return Response(str(img))
