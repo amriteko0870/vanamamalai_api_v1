@@ -38,6 +38,7 @@ from apiApp.models import vanamamalai_education,vanamamalai_education_tab
 
 #-----------------------------extra -----------------------------------------------------
 from apiApp.extra import navbar_extra_data,other_temple_extra,branches_extra,ponnadikkal_jeeyar_extra
+from apiApp.admin_pages.image_upload import image_upload
 
 @api_view(['GET'])
 def landingPage(request,format=None):
@@ -357,6 +358,18 @@ def ponnadikkal_jeeyars(request,format=None):
     res['tab_data'] = tab_data
     return Response(res)
 
+
+
+@api_view(['POST'])
+def newImageUpload(request,format=None):
+    file = request.FILES['file']
+    index = request.data['index']
+    imageArray = request.data['image_array'].split(',')
+    img_path = 'img/'
+    upload_res = image_upload(file,img_path)
+    updated_value = 'media/'+upload_res
+    imageArray[int(index)] = updated_value
+    return Response({'image_array':imageArray})
 # @api_view(['GET'])
 # def index(request):
 #     j = [

@@ -176,16 +176,17 @@ def sideBarAdmin(request,format=None):
     vn_temple = {
                  "main_link":{
                               "link_name": "Vanamamalai Temple",
-                              "link_code": "vn_temple_edit"
+                              "link_code": "vn_temple_edit",
+                              "link_path": "/admin/sub_admin_page/vn_temple_edit"
                              },
                 }
     vn_sub_links = vanamamalai_temple.objects.annotate(
                                                         link_code = V('vn_temple_edit'),
                                                         sub_link_name = F('content_title'),
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_admin_page/vn_temple_edit/'),Cast('id',CharField()),output_field=CharField())
+                                                        sub_link_path = Concat(V('/admin/sub_admin_page/vn_temple_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
-    vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+#     vn_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_temple['sub_links'] = vn_sub_links
     navbar.append(vn_temple)
 
@@ -202,7 +203,7 @@ def sideBarAdmin(request,format=None):
                                                         link_code = V('other_temple_edit'),
                                                         sub_link_name = F('content_title'),
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_admin_page/other_temple_edit/'),Cast('id',CharField()),output_field=CharField())
+                                                        sub_link_path = Concat(V('/admin/sub_admin_page/other_temple_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
     vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_other_temple['sub_links'] = vn_sub_links
@@ -219,7 +220,7 @@ def sideBarAdmin(request,format=None):
                                                         link_code = V('branches_edit'),
                                                         sub_link_name = F('content_title'),
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_admin_page/branches_edit/'),Cast('id',CharField()),output_field=CharField())
+                                                        sub_link_path = Concat(V('/admin/sub_admin_page/branches_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
     vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_branches['sub_links'] = vn_sub_links
@@ -255,7 +256,7 @@ def sideBarAdmin(request,format=None):
                                                         link_code = V('vn_education'),
                                                         sub_link_name = F('content_title'),
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
-                                                        sub_link_path = Concat(V('/sub_admin_page/vn_education_edit/'),Cast('id',CharField()),output_field=CharField())
+                                                        sub_link_path = Concat(V('/admin/sub_admin_page/vn_education_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
     vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_edu['sub_links'] = vn_sub_links

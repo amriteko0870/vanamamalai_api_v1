@@ -150,7 +150,6 @@ def home_page(request,format=None):
                               'title':'Cover Image',
                               'content':i['img'].split('|'),
                               'type':'image',
-                              'update':False
                            },
                         ]
          mock_id = mock_id + 4
@@ -160,32 +159,24 @@ def home_page(request,format=None):
       res['all_sections'] = all_sections
       return Response(res)
    if request.method == 'PUT':
-      # img = request.FILES['img']
-      # img_path = ''
-      # img_res = image_upload(img,img_path)
-      # return Response(img_res)
       data = request.data
+
       for i in data['all_sections']:
          obj = landing_page.objects.filter(id = i['section_id']).values().last()
          h1 = i['section_data'][0]['content']
          h2 = i['section_data'][1]['content']
          p = i['section_data'][2]['content']
-         image = i['section_data'][3]['content']
-         updated_image_array = []
-         if i['section_data'][3]['update']:
-            print('Helloooooooooooooooo')
-            for j in range(len(image)):
-               if str(image[j]).startswith('media/img/'):
-                  updated_image_array.append(str(image[j]))
-               else:
-                  img = j
-                  img_path = 'img/'
-                  new_image = image_upload(img,img_path)
-                  updated_image_array.append('media/img/'+new_image)
-         else:
-            updated_image_array = image
-
-         return Response(i)
-      return Response(data['all_sections'])
+         image = '|'.join(i['section_data'][3]['content'])
+         landing_page.objects.filter(id = i['section_id']).update(
+                                                                     h1 = h1,
+                                                                     h2 = h2,
+                                                                     p = p,
+                                                                     img = image,
+                                                                  )
+      res = {
+               'status':True,
+               'data':data
+            }
+      return Response()
 
 
