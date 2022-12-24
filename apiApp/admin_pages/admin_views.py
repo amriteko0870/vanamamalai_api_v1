@@ -151,8 +151,14 @@ def home_page(request,format=None):
                               'content':i['img'].split('|'),
                               'type':'image',
                            },
+                           {
+                              'id':mock_id+4,
+                              'title':'Background Color',
+                              'content':i['background_color'],
+                              'type':'color',
+                           },
                         ]
-         mock_id = mock_id + 4
+         mock_id = mock_id + 5
          sub_dict['section_data'] = section_data
          all_sections.append(sub_dict)
       
@@ -166,12 +172,14 @@ def home_page(request,format=None):
          h1 = i['section_data'][0]['content']
          h2 = i['section_data'][1]['content']
          p = i['section_data'][2]['content']
+         background_color = i['section_data'][4]['content']
          image = '|'.join(i['section_data'][3]['content'])
          landing_page.objects.filter(id = i['section_id']).update(
                                                                      h1 = h1,
                                                                      h2 = h2,
                                                                      p = p,
                                                                      img = image,
+                                                                     background_color = background_color
                                                                   )
       res = {
                'status':True,
