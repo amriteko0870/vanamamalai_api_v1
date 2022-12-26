@@ -42,7 +42,7 @@ from apiApp.admin_pages.image_upload import image_upload
 
 @api_view(['GET'])
 def landingPage(request,format=None):
-    data = landing_page.objects.annotate(
+    data = landing_page.objects.filter(show_status = True).annotate(
                                         seq_no = Concat(V('landing_page_'),Cast('order',CharField()),output_field=CharField()),
                                         ).values()
     n_data = pd.DataFrame(data)

@@ -38,7 +38,7 @@ from apiApp.models import rootPageStatus
 
 #--------------------------- extra -------------------------------------------------
 from apiApp.admin_pages.image_upload import image_upload
-
+from apiApp.admin_pages.layout import layoutCreation
 #---------------------------------------- start your views -----------------------------------------------
 
 @api_view(['POST'])
@@ -127,6 +127,7 @@ def home_page(request,format=None):
          sub_dict = {}
          sub_dict['section_name'] = 'Section '+str(i['order'])
          sub_dict['section_id'] = i['id']
+         sub_dict['status'] = i['show_status']
          section_data = [
                            {  'id':mock_id,
                               'title':'Heading',
@@ -157,8 +158,25 @@ def home_page(request,format=None):
                               'content':i['background_color'],
                               'type':'color',
                            },
+                           {
+                              'id':mock_id+5,
+                              'title':'Youtube',
+                              'content_title':i['yt_title'],
+                              'content':i['yt_link'],
+                              'type':'yt_link',
+                              'link_status': True if i['layout'] in ['left_image','right_image'] else False
+                           },
+                           {
+                              'id':mock_id+6,
+                              'title':'PDF',
+                              'content_title':i['file_title'],
+                              'content':i['file_link'],
+                              'type':'file',
+                              'link_status': True if i['layout'] in ['left_image','right_image'] else False
+                           },
+                           
                         ]
-         mock_id = mock_id + 5
+         mock_id = mock_id + 7
          sub_dict['section_data'] = section_data
          all_sections.append(sub_dict)
       
@@ -172,14 +190,22 @@ def home_page(request,format=None):
          h1 = i['section_data'][0]['content']
          h2 = i['section_data'][1]['content']
          p = i['section_data'][2]['content']
-         background_color = i['section_data'][4]['content']
          image = '|'.join(i['section_data'][3]['content'])
+         background_color = i['section_data'][4]['content']
+         yt_link = i['section_data'][5]['content']
+         yt_title = i['section_data'][5]['content_title']
+         file_link = i['section_data'][2]['content']
+         file_title =i['section_data'][6]['content_title']
          landing_page.objects.filter(id = i['section_id']).update(
                                                                      h1 = h1,
                                                                      h2 = h2,
                                                                      p = p,
                                                                      img = image,
-                                                                     background_color = background_color
+                                                                     background_color = background_color,
+                                                                     yt_link = yt_link,
+                                                                     file_link = file_link,
+                                                                     yt_title = yt_title,
+                                                                     file_title = file_title,
                                                                   )
       res = {
                'status':True,
@@ -188,3 +214,41 @@ def home_page(request,format=None):
       return Response()
 
 
+
+@api_view(['POST','DELETE','PUT'])
+def addSectionLandingPage(request,format=None):
+   if request.method == 'POST':
+      layout_type = request.data['layout_type']
+      last_order = landing_page.objects.aggregate(max = Max('order'))['max']
+      if layoutCreation(last_order,layout_type):
+         res = {
+                  'status': True,
+                  'message':'new section created',
+               }
+      else:
+         res = {
+                  'status': False,
+                  'message':'invalid layout type',
+               }
+      return Response(res)
+   if request.method == 'DELETE':
+      section_id = request.data['section_id']
+      landing_page.objects.filter(id = section_id).delete()
+      res = {
+               'status':True,
+               'message':'section deleted successfully'
+            }
+      return Response(res)
+   if request.method == 'PUT':
+      section_id = request.data['data']['section_id']
+      current_status = request.data['data']['current_status']
+      if current_status:
+         landing_page.objects.filter(id = section_id).update(show_status = False)
+      else:
+         landing_page.objects.filter(id = section_id).update(show_status = True)
+
+      res = {
+               'status':True,
+               'message':'section status changed successfully'
+            }
+      return Response(res)

@@ -15,6 +15,7 @@ class landing_page(models.Model):
     file_title = models.CharField(max_length=2000,blank=True)
     layout = models.CharField(max_length=2000,blank=True)
     background_color = models.CharField(max_length=50,blank=True)
+    show_status = models.BooleanField()
 
 #-------------------------------------------------------------------------------
 class vanamamalai_temple(models.Model):
