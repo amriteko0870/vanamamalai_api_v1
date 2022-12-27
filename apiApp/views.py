@@ -370,6 +370,15 @@ def newImageUpload(request,format=None):
     updated_value = 'media/'+upload_res
     imageArray[int(index)] = updated_value
     return Response({'image_array':imageArray})
+
+
+@api_view(['GET'])
+def fileDownload(request,format=None):
+    file_name =  request.GET.get('file_name')
+    response = FileResponse(open(file_name, 'rb'))
+    return response
+
+
 # @api_view(['GET'])
 # def index(request):
 #     j = [

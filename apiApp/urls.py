@@ -39,6 +39,8 @@ urlpatterns = [
     
     path('',views.index,name='index'),
     path('newImageUpload',views.newImageUpload,name='newImageUpload'),
+    path('fileDownload',views.fileDownload,name='newImageUpload'),
+    
     
     
 ] +static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

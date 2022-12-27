@@ -132,31 +132,37 @@ def home_page(request,format=None):
                            {  'id':mock_id,
                               'title':'Heading',
                               'content':i['h1'],
-                              'type':'text'
+                              'type':'text',
+                              'link_status': True,
                            },
                            {
                               'id':mock_id+1,
                               'title':'Sub Heading',
                               'content':i['h2'],
-                              'type':'text'
+                              'type':'text',
+                              'link_status': False if i['layout'] in ['left_image','right_image'] else True
+
                            },
                            {
                               'id':mock_id+2,
                               'title':'Brief Info',
                               'content':i['p'],
-                              'type':'text'
+                              'type':'text',
+                              'link_status': True,
                            },
                            {
                               'id':mock_id+3,
                               'title':'Cover Image',
                               'content':i['img'].split('|'),
                               'type':'image',
+                              'link_status': True,
                            },
                            {
                               'id':mock_id+4,
                               'title':'Background Color',
                               'content':i['background_color'],
                               'type':'color',
+                              'link_status': False if i['layout'] in ['hero'] else True
                            },
                            {
                               'id':mock_id+5,
@@ -170,7 +176,7 @@ def home_page(request,format=None):
                               'id':mock_id+6,
                               'title':'PDF',
                               'content_title':i['file_title'],
-                              'content':i['file_link'],
+                              'content':[i['file_link']],
                               'type':'file',
                               'link_status': True if i['layout'] in ['left_image','right_image'] else False
                            },
@@ -194,8 +200,9 @@ def home_page(request,format=None):
          background_color = i['section_data'][4]['content']
          yt_link = i['section_data'][5]['content']
          yt_title = i['section_data'][5]['content_title']
-         file_link = i['section_data'][2]['content']
+         file_link = i['section_data'][6]['content'][0]
          file_title =i['section_data'][6]['content_title']
+
          landing_page.objects.filter(id = i['section_id']).update(
                                                                      h1 = h1,
                                                                      h2 = h2,
