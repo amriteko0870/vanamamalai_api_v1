@@ -54,7 +54,8 @@ def sideBar(request,format=None):
                               "link_code": "vn_temple"
                              },
                 }
-    vn_sub_links = vanamamalai_temple.objects.annotate(
+    vn_sub_links = vanamamalai_temple.objects.filter(show_status = True)\
+                                             .annotate(
                                                         link_code = V('vn_temple'),
                                                         sub_link_name = F('content_title'),
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),

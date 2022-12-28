@@ -32,6 +32,7 @@ urlpatterns = [
     path('adminDashboard',admin_views.adminDashboard,name='adminDashboard'),
     path('home_page',admin_views.home_page,name='home_page'),
     path('addSectionLandingPage',admin_views.addSectionLandingPage,name='addSectionLandingPage'),
+    path('vn_temple_edit',admin_views.vn_temple_edit,name='vn_temple_edit'),
     
     
     path('login',u_views.login,name='login'),

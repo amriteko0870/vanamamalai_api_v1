@@ -19,16 +19,17 @@ class landing_page(models.Model):
 
 #-------------------------------------------------------------------------------
 class vanamamalai_temple(models.Model):
-    banner_image = models.TextField()
-    banner_heading = models.TextField()
-    content_title = models.TextField()
-    content_subtitle = models.TextField()
-    content_image = models.TextField()
+    banner_image = models.TextField(blank=True)
+    banner_heading = models.TextField(blank=True)
+    content_title = models.TextField(blank=True)
+    content_subtitle = models.TextField(blank=True)
+    content_image = models.TextField(blank=True)
+    show_status = models.BooleanField()
 
 class vanamamalai_temple_tab(models.Model):
-    temple_id = models.IntegerField()
-    tab_heading = models.TextField()
-    tab_desc = models.TextField()
+    temple_id = models.IntegerField(blank=True)
+    tab_heading = models.TextField(blank=True)
+    tab_desc = models.TextField(blank=True)
 
 #----------------------------------------------------------------------------------
 class vanamamalai_other_temple(models.Model):
@@ -37,6 +38,7 @@ class vanamamalai_other_temple(models.Model):
     content_title = models.TextField()
     content_subtitle = models.TextField()
     content_image = models.TextField()
+    show_status = models.BooleanField()
 
 class vanamamalai_other_temple_tab(models.Model):
     temple_id = models.IntegerField()
@@ -50,6 +52,7 @@ class vanamamalai_mutt_branches(models.Model):
     content_title = models.TextField()
     content_subtitle = models.TextField()
     content_image = models.TextField()
+    show_status = models.BooleanField()
 
 class vanamamalai_mutt_branches_tab(models.Model):
     branch_id = models.IntegerField()
@@ -63,6 +66,7 @@ class ponnadikkal_jeeyar(models.Model):
     content_title = models.TextField()
     content_subtitle = models.TextField()
     content_image = models.TextField()
+    show_status = models.BooleanField()
 
 class ponnadikkal_jeeyar_tab(models.Model):
     jeeyar_id = models.IntegerField()
@@ -80,6 +84,7 @@ class vanamamalai_education(models.Model):
     content_title = models.TextField()
     content_subtitle = models.TextField()
     content_image = models.TextField()
+    show_status = models.BooleanField()
 
 class vanamamalai_education_tab(models.Model):
     education_id = models.IntegerField()

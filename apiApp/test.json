@@ -1,0 +1,27 @@
+{
+  "pageName": "Vanamamalai Temple",
+  "all_input_fields": [
+    {
+      "content": "Vanamamalai Temple",
+      "id": 1,
+      "title": "Heading",
+      "type": "text"
+    },
+    {
+      "content": ["media/img/bannertala_fG8hka3.jpg"],
+      "id": 2,
+      "title": "Banner Image",
+      "type": "image"
+    }
+  ],
+  "sub_page_list": [
+    {
+      "subpage_name": "temple history",
+      "subpage_link": "/admin/sub_admin_page/vn_temple_edit/6"
+    },
+    {
+      "subpage_name": "moolavar - vanamamalai",
+      "subpage_link": "/admin/sub_admin_page/vn_temple_edit/7"
+    }
+  ]
+}

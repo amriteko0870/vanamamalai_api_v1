@@ -259,3 +259,92 @@ def addSectionLandingPage(request,format=None):
                'message':'section status changed successfully'
             }
       return Response(res)
+
+
+@api_view(['GET','PUT','POST','DELETE','PATCH'])
+def vn_temple_edit(request,format=None):
+   if request.method == 'GET':
+      obj = vanamamalai_temple.objects.values()
+      res = {}
+      res['pageName'] = obj.first()['banner_heading']
+      mock_id = 1
+      all_input_fields = [
+                           {
+                              'content': obj.first()['banner_heading'],
+                              'id': mock_id,
+                              'title': "Heading",
+                              'type': "text",
+                           },
+                           {
+                              'content': obj.first()['banner_image'].split(','),
+                              'id': mock_id+1,
+                              'title': "Banner Image",
+                              'type': "image",
+                              },
+                         ]
+      res['all_input_fields'] = all_input_fields
+      sub_page_list = obj.annotate(
+                                       subpage_name = Lower(F('content_title')),
+                                       subpage_link = Concat(
+                                                               V('/admin/sub_admin_page/vn_temple_edit/'),
+                                                               Cast('id',CharField()),
+                                                               output_field=CharField()
+                                                            )
+                                    )\
+                        .values('id','subpage_name','subpage_link','show_status')
+      res['sub_page_list'] = sub_page_list
+      return Response(res)
+
+   if request.method == 'PUT':
+      data = request.data
+      banner_heading = data['all_input_fields'][0]['content']
+      banner_image = ''.join(data['all_input_fields'][1]['content'])
+      vanamamalai_temple.objects.all().update(
+                                                banner_image = banner_image,
+                                                banner_heading = banner_heading,
+                                             )
+      res = {
+               'status':True,
+               'message':'Updation successfull',
+            }
+      return Response(res)
+
+   if request.method == 'POST':
+      data = vanamamalai_temple(
+                                    banner_image = '',
+                                    banner_heading = 'Vanamamalai Temple',
+                                    content_title = 'New Section',
+                                    content_subtitle = '', 
+                                    content_image = '',
+                                    show_status = False,
+                                 )
+      data.save()
+      res = {
+               'status':True,
+               'message':'new section created successfully',
+            }
+      return Response(res)
+
+   if request.method == 'DELETE':
+      data = request.data
+      vanamamalai_temple.objects.filter(id = data['id']).delete()
+      vanamamalai_temple_tab.objects.filter(temple_id = data['id']).delete()
+      res = {
+            'status':True,
+            'message':'deleted successfully',
+         }
+      return Response(data)
+
+   if request.method == 'PATCH':
+      data = request.data['data']
+      obj = vanamamalai_temple.objects.filter(id = data['id']).values()
+      if obj.last()['show_status']:
+         obj.update(show_status = False)
+      else:
+         obj.update(show_status = True)
+      res = {
+            'status':True,
+            'message':'status changed successfully',
+         }
+      return Response(res)      
+                  
