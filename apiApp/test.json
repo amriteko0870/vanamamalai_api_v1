@@ -1,27 +1,63 @@
 {
   "pageName": "Vanamamalai Temple",
-  "all_input_fields": [
+  "subPageName": "TEMPLE HISTORY",
+  "heading": "TEMPLE HISTORY",
+  "subheading": "Lorem Ipsum",
+  "all_tabs": [
     {
-      "content": "Vanamamalai Temple",
-      "id": 1,
-      "title": "Heading",
-      "type": "text"
+      "show_status": true,
+      "tab_name": "Details",
+      "tab_id": 1,
+      "tab_data": [
+        {
+          "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+          "type": "text",
+          "id": "bf1"
+        },
+        { "data": "sss", "type": "text", "id": "bf5" },
+        {
+          "data": "media/img/bannertala_FoXYs1G.jpg",
+          "type": "image",
+          "id": "bf6"
+        }
+      ]
     },
     {
-      "content": ["media/img/bannertala_fG8hka3.jpg"],
-      "id": 2,
-      "title": "Banner Image",
-      "type": "image"
+      "show_status": true,
+      "tab_name": "History",
+      "tab_id": 2,
+      "tab_data": [
+        {
+          "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. e ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+          "type": "text",
+          "id": "bf2"
+        }
+      ]
+    },
+    {
+      "show_status": true,
+      "tab_name": "Events",
+      "tab_id": 3,
+      "tab_data": [
+        {
+          "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium.",
+          "type": "text",
+          "id": "bf3"
+        }
+      ]
+    },
+    {
+      "show_status": true,
+      "tab_name": "How to Reach",
+      "tab_id": 4,
+      "tab_data": [
+        {
+          "data": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit quasi illo praesentium. Sit nam non distinctio exercitationem, quaerat reiciendis illo molestias. Deleniti ipsum odit cum laudantium. Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quo ipsam accusantium molestias nobis perspiciatis sapiente ipsa eveniet dolore cupiditate at adipisci non omnis expedita, qui error repudiandae magnam enim quisquam tempora reprehenderit",
+          "type": "text",
+          "id": "bf4"
+        }
+      ]
     }
   ],
-  "sub_page_list": [
-    {
-      "subpage_name": "temple history",
-      "subpage_link": "/admin/sub_admin_page/vn_temple_edit/6"
-    },
-    {
-      "subpage_name": "moolavar - vanamamalai",
-      "subpage_link": "/admin/sub_admin_page/vn_temple_edit/7"
-    }
-  ]
+  "new_id": 7
 }

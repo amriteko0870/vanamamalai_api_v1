@@ -178,7 +178,7 @@ def sideBarAdmin(request,format=None):
                  "main_link":{
                               "link_name": "Vanamamalai Temple",
                               "link_code": "vn_temple_edit",
-                              "link_path": "/admin/sub_admin_page/vn_temple_edit"
+                              "link_path": "/admin/sub_admin_page/vn_temple_edit/"
                              },
                 }
     vn_sub_links = vanamamalai_temple.objects.annotate(

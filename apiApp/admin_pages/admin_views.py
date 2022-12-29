@@ -38,7 +38,7 @@ from apiApp.models import rootPageStatus
 
 #--------------------------- extra -------------------------------------------------
 from apiApp.admin_pages.image_upload import image_upload
-from apiApp.admin_pages.layout import layoutCreation
+from apiApp.admin_pages.layout import layoutCreation,addTab
 #---------------------------------------- start your views -----------------------------------------------
 
 @api_view(['POST'])
@@ -263,88 +263,165 @@ def addSectionLandingPage(request,format=None):
 
 @api_view(['GET','PUT','POST','DELETE','PATCH'])
 def vn_temple_edit(request,format=None):
-   if request.method == 'GET':
-      obj = vanamamalai_temple.objects.values()
-      res = {}
-      res['pageName'] = obj.first()['banner_heading']
-      mock_id = 1
-      all_input_fields = [
-                           {
-                              'content': obj.first()['banner_heading'],
-                              'id': mock_id,
-                              'title': "Heading",
-                              'type': "text",
-                           },
-                           {
-                              'content': obj.first()['banner_image'].split(','),
-                              'id': mock_id+1,
-                              'title': "Banner Image",
-                              'type': "image",
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      if request.method =="GET":
+         obj = vanamamalai_temple.objects.filter(id = page_id).values().last()
+         tab_obj = list(vanamamalai_temple_tab.objects.filter(temple_id = page_id)\
+                                                .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['content_title']
+         res['heading'] = obj['content_title']
+         res['subheading'] = obj['content_subtitle']
+         
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method == 'POST':
+         data = request.data
+         page_id = data['page_id']
+         heading = data['heading']
+         subheading = data['subheading']
+         vanamamalai_temple.objects.filter(id = page_id).update(
+                                                                  content_title = heading,
+                                                                  content_subtitle = subheading,
+                                                               )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            vanamamalai_temple_tab.objects.filter(temple_id = page_id,id = tab_id)\
+                                          .update(
+                                                   tab_heading = tab_name,
+                                                   tab_desc = tab_desc,
+                                                   show_status = tab_show_status,
+                                                 )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+         }
+         return Response(data)
+   else:
+      if request.method == 'GET':
+         obj = vanamamalai_temple.objects.values()
+         res = {}
+         res['pageName'] = obj.first()['banner_heading']
+         mock_id = 1
+         all_input_fields = [
+                              {
+                                 'content': obj.first()['banner_heading'],
+                                 'id': mock_id,
+                                 'title': "Heading",
+                                 'type': "text",
                               },
-                         ]
-      res['all_input_fields'] = all_input_fields
-      sub_page_list = obj.annotate(
-                                       subpage_name = Lower(F('content_title')),
-                                       subpage_link = Concat(
-                                                               V('/admin/sub_admin_page/vn_temple_edit/'),
-                                                               Cast('id',CharField()),
-                                                               output_field=CharField()
-                                                            )
-                                    )\
-                        .values('id','subpage_name','subpage_link','show_status')
-      res['sub_page_list'] = sub_page_list
-      return Response(res)
+                              {
+                                 'content': obj.first()['banner_image'].split(','),
+                                 'id': mock_id+1,
+                                 'title': "Banner Image",
+                                 'type': "image",
+                                 },
+                           ]
+         res['all_input_fields'] = all_input_fields
+         sub_page_list = obj.annotate(
+                                          subpage_name = Lower(F('content_title')),
+                                          subpage_link = Concat(
+                                                                  V('/admin/sub_admin_page/vn_temple_edit/'),
+                                                                  Cast('id',CharField()),
+                                                                  output_field=CharField()
+                                                               )
+                                       )\
+                           .values('id','subpage_name','subpage_link','show_status')
+         res['sub_page_list'] = sub_page_list
+         return Response(res)
 
-   if request.method == 'PUT':
-      data = request.data
-      banner_heading = data['all_input_fields'][0]['content']
-      banner_image = ''.join(data['all_input_fields'][1]['content'])
-      vanamamalai_temple.objects.all().update(
-                                                banner_image = banner_image,
-                                                banner_heading = banner_heading,
-                                             )
-      res = {
+      if request.method == 'PUT':
+         data = request.data
+         banner_heading = data['all_input_fields'][0]['content']
+         banner_image = ''.join(data['all_input_fields'][1]['content'])
+         vanamamalai_temple.objects.all().update(
+                                                   banner_image = banner_image,
+                                                   banner_heading = banner_heading,
+                                                )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull',
+               }
+         return Response(res)
+
+      if request.method == 'POST':
+         data = vanamamalai_temple(
+                                       banner_image = '',
+                                       banner_heading = 'Vanamamalai Temple',
+                                       content_title = 'New Section',
+                                       content_subtitle = '', 
+                                       content_image = '',
+                                       show_status = False,
+                                    )
+         data.save()
+         res = {
+                  'status':True,
+                  'message':'new section created successfully',
+               }
+         return Response(res)
+
+      if request.method == 'DELETE':
+         data = request.data
+         vanamamalai_temple.objects.filter(id = data['id']).delete()
+         vanamamalai_temple_tab.objects.filter(temple_id = data['id']).delete()
+         res = {
                'status':True,
-               'message':'Updation successfull',
+               'message':'deleted successfully',
             }
-      return Response(res)
+         return Response(data)
 
-   if request.method == 'POST':
-      data = vanamamalai_temple(
-                                    banner_image = '',
-                                    banner_heading = 'Vanamamalai Temple',
-                                    content_title = 'New Section',
-                                    content_subtitle = '', 
-                                    content_image = '',
-                                    show_status = False,
-                                 )
-      data.save()
-      res = {
+      if request.method == 'PATCH':
+         data = request.data['data']
+         obj = vanamamalai_temple.objects.filter(id = data['id']).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
                'status':True,
-               'message':'new section created successfully',
+               'message':'status changed successfully',
             }
-      return Response(res)
+         return Response(res)      
 
-   if request.method == 'DELETE':
-      data = request.data
-      vanamamalai_temple.objects.filter(id = data['id']).delete()
-      vanamamalai_temple_tab.objects.filter(temple_id = data['id']).delete()
-      res = {
-            'status':True,
-            'message':'deleted successfully',
-         }
-      return Response(data)
+@api_view(['POST'])
+def adminAddNewTabData(request,format=None):
+   id = request.data['id']
+   type1 =request.data['type']
+   array = request.data['dataArray']
+   res = addTab(id,type1,eval(array))
+   return Response(res)
 
-   if request.method == 'PATCH':
-      data = request.data['data']
-      obj = vanamamalai_temple.objects.filter(id = data['id']).values()
-      if obj.last()['show_status']:
-         obj.update(show_status = False)
-      else:
-         obj.update(show_status = True)
-      res = {
-            'status':True,
-            'message':'status changed successfully',
-         }
-      return Response(res)      
-                  
+
+@api_view(['POST'])
+def addImageTabDataAdmin(request,format=None):
+   file = request.FILES['file']
+   id = request.data['id']
+   array = eval(request.data['dataArray'])
+   img_path = 'img/'
+   upload_res = image_upload(file,img_path)
+   updated_value = 'media/'+upload_res
+   array.append({
+                  'data':updated_value,
+                  'type':'image',
+                  'id':'bf'+str(id)
+
+               })
+   return Response(array)

@@ -30,6 +30,7 @@ class vanamamalai_temple_tab(models.Model):
     temple_id = models.IntegerField(blank=True)
     tab_heading = models.TextField(blank=True)
     tab_desc = models.TextField(blank=True)
+    show_status = models.BooleanField()
 
 #----------------------------------------------------------------------------------
 class vanamamalai_other_temple(models.Model):

@@ -40,3 +40,13 @@ def layoutCreation(last_order,layout_type):
         return True
     else:
         return False
+
+
+def addTab(id,type1,array):
+    arr = array
+    arr.append({
+            'data':'',
+            'type':type1,
+            'id':'bf'+str(id),
+           })
+    return arr

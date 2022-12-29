@@ -33,6 +33,8 @@ urlpatterns = [
     path('home_page',admin_views.home_page,name='home_page'),
     path('addSectionLandingPage',admin_views.addSectionLandingPage,name='addSectionLandingPage'),
     path('vn_temple_edit',admin_views.vn_temple_edit,name='vn_temple_edit'),
+    path('adminAddNewTabData',admin_views.adminAddNewTabData,name='adminAddNewTabData'),
+    path('addImageTabDataAdmin',admin_views.addImageTabDataAdmin,name='addImageTabDataAdmin'),
     
     
     path('login',u_views.login,name='login'),
