@@ -1,15 +1,7 @@
-import numpy as np
 import pandas as pd
-import time
 from datetime import datetime as dt
-import datetime
-import re
 from operator import itemgetter 
-import os
-import random
 import simplejson as json
-import cv2 
-import os 
 
 #-------------------------Django Modules---------------------------------------------
 from django.http import Http404, HttpResponse, JsonResponse,FileResponse
