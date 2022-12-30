@@ -4,9 +4,9 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from . import views
-from . import user_views as u_views
-from . import sidebar_views as s_views
+import apiApp.views as views
+import apiApp.user_views as u_views
+import apiApp.sidebar_views as s_views
 import apiApp.admin_pages.admin_views as admin_views
 
 urlpatterns = [
