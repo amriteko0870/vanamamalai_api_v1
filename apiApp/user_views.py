@@ -31,8 +31,8 @@ def login(request,format=ModuleNotFoundError):
     username = request.data['username']
     password = request.data['password']
 
-    if username in ['amrit','vivek']:
-        if password == '1234':
+    if username in ['amrit','vivek','admin']:
+        if password == 'Vanama@312022':
             return Response(
                             {
                              'message':'Login Successfull',

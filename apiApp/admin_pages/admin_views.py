@@ -59,7 +59,7 @@ def adminDashboard(request,format=None):
                         'page_name':'Vanamamalai temple',
                         'sub_pages':vanamamalai_temple.objects.values().count(),
                         'status':obj.filter(title__iexact = 'Vanamamalai temple').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
+                        'page_link':'/admin/sub_admin_page/vn_temple_edit/'
                      }
     data.append(vm_temple_data)
 
@@ -111,7 +111,7 @@ def adminDashboard(request,format=None):
                      }
     data.append(gallery_data)
 
-    res['all_page_data'] = data
+    res['all_page_data'] = data[:2]
     return Response(res)
     
 
@@ -279,6 +279,7 @@ def vn_temple_edit(request,format=None):
          res['subPageName'] = obj['content_title']
          res['heading'] = obj['content_title']
          res['subheading'] = obj['content_subtitle']
+         res['content_image'] = obj['content_image']
          
          c = 1
          for i in tab_obj:
@@ -290,14 +291,16 @@ def vn_temple_edit(request,format=None):
          res['new_id'] = c   
          return Response(res)
       
-      if request.method == 'POST':
+      if request.method == 'PUT':
          data = request.data
          page_id = data['page_id']
          heading = data['heading']
          subheading = data['subheading']
+         content_image = data['content_image']
          vanamamalai_temple.objects.filter(id = page_id).update(
                                                                   content_title = heading,
                                                                   content_subtitle = subheading,
+                                                                  content_image = content_image,
                                                                )
          for i in data['all_tabs']:
             tab_show_status = i['show_status']
@@ -314,7 +317,46 @@ def vn_temple_edit(request,format=None):
                   'status':True,
                   'message':'Updation successfull'
          }
-         return Response(data)
+         return Response(res)
+      
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         
+         data = vanamamalai_temple_tab(
+                                    temple_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = vanamamalai_temple_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         vanamamalai_temple_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
    else:
       if request.method == 'GET':
          obj = vanamamalai_temple.objects.values()
@@ -405,16 +447,33 @@ def vn_temple_edit(request,format=None):
 def adminAddNewTabData(request,format=None):
    id = request.data['id']
    type1 =request.data['type']
-   array = request.data['dataArray']
-   res = addTab(id,type1,eval(array))
-   return Response(res)
+   array = eval(request.data['dataArray'])[0]
+   tab_id = eval(request.data['tabId'])[0]
+
+   page_data = request.data['pageData'].replace('true','True')
+   page_data = page_data.replace('false','False')
+   page_data = eval(page_data)
+   
+   res = addTab(id,type1,array)
+   for i in page_data['all_tabs']:
+      if i['tab_id'] == tab_id:
+         i['tab_data'] = res
+         break
+
+   return Response(page_data)
 
 
 @api_view(['POST'])
 def addImageTabDataAdmin(request,format=None):
    file = request.FILES['file']
    id = request.data['id']
-   array = eval(request.data['dataArray'])
+   array = eval(request.data['dataArray'])[0]
+   tab_id = eval(request.data['tabId'])[0]
+
+   page_data = request.data['pageData'].replace('true','True')
+   page_data = page_data.replace('false','False')
+   page_data = eval(page_data)
+   
    img_path = 'img/'
    upload_res = image_upload(file,img_path)
    updated_value = 'media/'+upload_res
@@ -424,4 +483,10 @@ def addImageTabDataAdmin(request,format=None):
                   'id':'bf'+str(id)
 
                })
-   return Response(array)
+   for i in page_data['all_tabs']:
+      if i['tab_id'] == tab_id:
+         i['tab_data'] = array
+         break
+
+
+   return Response(page_data)

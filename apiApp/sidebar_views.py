@@ -271,4 +271,4 @@ def sideBarAdmin(request,format=None):
                             }
               }
     navbar.append(gallery)
-    return Response(navbar)
+    return Response(navbar[:3])

@@ -63,7 +63,7 @@ def vn_temple(request,format=None):
     id = request.data['id']
     res = {}
     obj = vanamamalai_temple.objects.filter(id = id).values().last()
-    tab = vanamamalai_temple_tab.objects.filter(temple_id = id).values()
+    tab = vanamamalai_temple_tab.objects.filter(temple_id = id,show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],
@@ -82,7 +82,8 @@ def vn_temple(request,format=None):
     for i in tab:
         tab_content = {}
         tab_content['name'] = i['tab_heading']
-        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+        tab_content['content'] = eval(i['tab_desc'])
+        # tab_content['content'] = jsonDec.decode(i['tab_desc'])
 
         tab_data.append(tab_content)
 
