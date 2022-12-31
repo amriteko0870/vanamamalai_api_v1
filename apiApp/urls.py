@@ -33,8 +33,18 @@ urlpatterns = [
     path('home_page',admin_views.home_page,name='home_page'),
     path('addSectionLandingPage',admin_views.addSectionLandingPage,name='addSectionLandingPage'),
     path('vn_temple_edit',admin_views.vn_temple_edit,name='vn_temple_edit'),
+    path('other_temple_edit',admin_views.other_temple_edit,name='other_temple_edit'),
+    path('branches_edit',admin_views.branches_edit,name='branches_edit'),
+    path('vn_education_edit',admin_views.vn_education_edit,name='vn_education_edit'),
+    path('ponnadikkal_jeeyar_edit',admin_views.ponnadikkal_jeeyar_edit,name='ponnadikkal_jeeyar_edit'),
+    path('jeeyars_edit',admin_views.jeeyars_edit,name='jeeyars_edit'),
+
+
     path('adminAddNewTabData',admin_views.adminAddNewTabData,name='adminAddNewTabData'),
     path('addImageTabDataAdmin',admin_views.addImageTabDataAdmin,name='addImageTabDataAdmin'),
+    path('addImageJeeyarAdmin',admin_views.addImageJeeyarAdmin,name='addImageJeeyarAdmin'),
+    
+    
     
     
     path('login',u_views.login,name='login'),
@@ -43,7 +53,6 @@ urlpatterns = [
     path('',views.index,name='index'),
     path('newImageUpload',views.newImageUpload,name='newImageUpload'),
     path('fileDownload',views.fileDownload,name='newImageUpload'),
-    
     
     
 ] +static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

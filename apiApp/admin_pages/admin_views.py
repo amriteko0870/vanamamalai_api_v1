@@ -443,6 +443,727 @@ def vn_temple_edit(request,format=None):
             }
          return Response(res)      
 
+
+
+
+
+@api_view(['GET','PUT','POST','DELETE','PATCH'])
+def other_temple_edit(request,format=None):
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      if request.method =="GET":
+         obj = vanamamalai_other_temple.objects.filter(id = page_id).values().last()
+         tab_obj = list(vanamamalai_other_temple_tab.objects.filter(temple_id = page_id)\
+                                                .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['content_title']
+         res['heading'] = obj['content_title']
+         res['subheading'] = obj['content_subtitle']
+         res['content_image'] = obj['content_image']
+         
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         page_id = data['page_id']
+         heading = data['heading']
+         subheading = data['subheading']
+         content_image = data['content_image']
+         vanamamalai_other_temple.objects.filter(id = page_id).update(
+                                                                  content_title = heading,
+                                                                  content_subtitle = subheading,
+                                                                  content_image = content_image,
+                                                               )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            vanamamalai_other_temple_tab.objects.filter(temple_id = page_id,id = tab_id)\
+                                          .update(
+                                                   tab_heading = tab_name,
+                                                   tab_desc = tab_desc,
+                                                   show_status = tab_show_status,
+                                                 )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+         }
+         return Response(res)
+      
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         
+         data = vanamamalai_other_temple_tab(
+                                    temple_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = vanamamalai_other_temple_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         vanamamalai_other_temple_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
+   else:
+      if request.method == 'GET':
+         obj = vanamamalai_other_temple.objects.values()
+         res = {}
+         res['pageName'] = obj.first()['banner_heading']
+         mock_id = 1
+         all_input_fields = [
+                              {
+                                 'content': obj.first()['banner_heading'],
+                                 'id': mock_id,
+                                 'title': "Heading",
+                                 'type': "text",
+                              },
+                              {
+                                 'content': obj.first()['banner_image'].split(','),
+                                 'id': mock_id+1,
+                                 'title': "Banner Image",
+                                 'type': "image",
+                                 },
+                           ]
+         res['all_input_fields'] = all_input_fields
+         sub_page_list = obj.annotate(
+                                          subpage_name = Lower(F('content_title')),
+                                          subpage_link = Concat(
+                                                                  V('/admin/sub_admin_page/other_temple_edit/'),
+                                                                  Cast('id',CharField()),
+                                                                  output_field=CharField()
+                                                               )
+                                       )\
+                           .values('id','subpage_name','subpage_link','show_status')
+         res['sub_page_list'] = sub_page_list
+         return Response(res)
+
+      if request.method == 'PUT':
+         data = request.data
+         banner_heading = data['all_input_fields'][0]['content']
+         banner_image = ''.join(data['all_input_fields'][1]['content'])
+         vanamamalai_other_temple.objects.all().update(
+                                                   banner_image = banner_image,
+                                                   banner_heading = banner_heading,
+                                                )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull',
+               }
+         return Response(res)
+
+      if request.method == 'POST':
+         data = vanamamalai_other_temple(
+                                       banner_image = '',
+                                       banner_heading = 'Vanamamalai Temple',
+                                       content_title = 'New Section',
+                                       content_subtitle = '', 
+                                       content_image = '',
+                                       show_status = False,
+                                    )
+         data.save()
+         res = {
+                  'status':True,
+                  'message':'new section created successfully',
+               }
+         return Response(res)
+
+      if request.method == 'DELETE':
+         data = request.data
+         vanamamalai_other_temple.objects.filter(id = data['id']).delete()
+         vanamamalai_other_temple_tab.objects.filter(temple_id = data['id']).delete()
+         res = {
+               'status':True,
+               'message':'deleted successfully',
+            }
+         return Response(data)
+
+      if request.method == 'PATCH':
+         data = request.data['data']
+         obj = vanamamalai_other_temple.objects.filter(id = data['id']).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+               'status':True,
+               'message':'status changed successfully',
+            }
+         return Response(res)      
+
+
+
+
+
+
+
+@api_view(['GET','PUT','POST','DELETE','PATCH'])
+def branches_edit(request,format=None):
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      if request.method =="GET":
+         obj = vanamamalai_mutt_branches.objects.filter(id = page_id).values().last()
+         tab_obj = list(vanamamalai_mutt_branches_tab.objects.filter(branch_id = page_id)\
+                                                .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['content_title']
+         res['heading'] = obj['content_title']
+         res['subheading'] = obj['content_subtitle']
+         res['content_image'] = obj['content_image']
+         
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         page_id = data['page_id']
+         heading = data['heading']
+         subheading = data['subheading']
+         content_image = data['content_image']
+         vanamamalai_mutt_branches.objects.filter(id = page_id).update(
+                                                                  content_title = heading,
+                                                                  content_subtitle = subheading,
+                                                                  content_image = content_image,
+                                                               )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            vanamamalai_mutt_branches_tab.objects.filter(branch_id = page_id,id = tab_id)\
+                                          .update(
+                                                   tab_heading = tab_name,
+                                                   tab_desc = tab_desc,
+                                                   show_status = tab_show_status,
+                                                 )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+         }
+         return Response(res)
+      
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         
+         data = vanamamalai_mutt_branches_tab(
+                                    branch_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = vanamamalai_mutt_branches_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         vanamamalai_mutt_branches_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
+   else:
+      if request.method == 'GET':
+         obj = vanamamalai_mutt_branches.objects.values()
+         res = {}
+         res['pageName'] = obj.first()['banner_heading']
+         mock_id = 1
+         all_input_fields = [
+                              {
+                                 'content': obj.first()['banner_heading'],
+                                 'id': mock_id,
+                                 'title': "Heading",
+                                 'type': "text",
+                              },
+                              {
+                                 'content': obj.first()['banner_image'].split(','),
+                                 'id': mock_id+1,
+                                 'title': "Banner Image",
+                                 'type': "image",
+                                 },
+                           ]
+         res['all_input_fields'] = all_input_fields
+         sub_page_list = obj.annotate(
+                                          subpage_name = Lower(F('content_title')),
+                                          subpage_link = Concat(
+                                                                  V('/admin/sub_admin_page/branches_edit/'),
+                                                                  Cast('id',CharField()),
+                                                                  output_field=CharField()
+                                                               )
+                                       )\
+                           .values('id','subpage_name','subpage_link','show_status')
+         res['sub_page_list'] = sub_page_list
+         return Response(res)
+
+      if request.method == 'PUT':
+         data = request.data
+         banner_heading = data['all_input_fields'][0]['content']
+         banner_image = ''.join(data['all_input_fields'][1]['content'])
+         vanamamalai_mutt_branches.objects.all().update(
+                                                   banner_image = banner_image,
+                                                   banner_heading = banner_heading,
+                                                )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull',
+               }
+         return Response(res)
+
+      if request.method == 'POST':
+         data = vanamamalai_mutt_branches(
+                                       banner_image = '',
+                                       banner_heading = 'Vanamamalai Temple',
+                                       content_title = 'New Section',
+                                       content_subtitle = '', 
+                                       content_image = '',
+                                       show_status = False,
+                                    )
+         data.save()
+         res = {
+                  'status':True,
+                  'message':'new section created successfully',
+               }
+         return Response(res)
+
+      if request.method == 'DELETE':
+         data = request.data
+         vanamamalai_mutt_branches.objects.filter(id = data['id']).delete()
+         vanamamalai_mutt_branches_tab.objects.filter(branch_id = data['id']).delete()
+         res = {
+               'status':True,
+               'message':'deleted successfully',
+            }
+         return Response(data)
+
+      if request.method == 'PATCH':
+         data = request.data['data']
+         obj = vanamamalai_mutt_branches.objects.filter(id = data['id']).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+               'status':True,
+               'message':'status changed successfully',
+            }
+         return Response(res)
+
+
+
+
+@api_view(['GET','PUT','POST','DELETE','PATCH'])
+def vn_education_edit(request,format=None):
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      if request.method =="GET":
+         obj = vanamamalai_education.objects.filter(id = page_id).values().last()
+         tab_obj = list(vanamamalai_education_tab.objects.filter(education_id = page_id)\
+                                                .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['content_title']
+         res['heading'] = obj['content_title']
+         res['subheading'] = obj['content_subtitle']
+         res['content_image'] = obj['content_image']
+         
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         page_id = data['page_id']
+         heading = data['heading']
+         subheading = data['subheading']
+         content_image = data['content_image']
+         vanamamalai_education.objects.filter(id = page_id).update(
+                                                                  content_title = heading,
+                                                                  content_subtitle = subheading,
+                                                                  content_image = content_image,
+                                                               )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            vanamamalai_education_tab.objects.filter(education_id = page_id,id = tab_id)\
+                                          .update(
+                                                   tab_heading = tab_name,
+                                                   tab_desc = tab_desc,
+                                                   show_status = tab_show_status,
+                                                 )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+         }
+         return Response(res)
+      
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         
+         data = vanamamalai_education_tab(
+                                    education_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = vanamamalai_education_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         vanamamalai_education_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
+   else:
+      if request.method == 'GET':
+         obj = vanamamalai_education.objects.values()
+         res = {}
+         res['pageName'] = obj.first()['banner_heading']
+         mock_id = 1
+         all_input_fields = [
+                              {
+                                 'content': obj.first()['banner_heading'],
+                                 'id': mock_id,
+                                 'title': "Heading",
+                                 'type': "text",
+                              },
+                              {
+                                 'content': obj.first()['banner_image'].split(','),
+                                 'id': mock_id+1,
+                                 'title': "Banner Image",
+                                 'type': "image",
+                                 },
+                           ]
+         res['all_input_fields'] = all_input_fields
+         sub_page_list = obj.annotate(
+                                          subpage_name = Lower(F('content_title')),
+                                          subpage_link = Concat(
+                                                                  V('/admin/sub_admin_page/branches_edit/'),
+                                                                  Cast('id',CharField()),
+                                                                  output_field=CharField()
+                                                               )
+                                       )\
+                           .values('id','subpage_name','subpage_link','show_status')
+         res['sub_page_list'] = sub_page_list
+         return Response(res)
+
+      if request.method == 'PUT':
+         data = request.data
+         banner_heading = data['all_input_fields'][0]['content']
+         banner_image = ''.join(data['all_input_fields'][1]['content'])
+         vanamamalai_education.objects.all().update(
+                                                   banner_image = banner_image,
+                                                   banner_heading = banner_heading,
+                                                )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull',
+               }
+         return Response(res)
+
+      if request.method == 'POST':
+         data = vanamamalai_education(
+                                       banner_image = '',
+                                       banner_heading = 'Vanamamalai Temple',
+                                       content_title = 'New Section',
+                                       content_subtitle = '', 
+                                       content_image = '',
+                                       show_status = False,
+                                    )
+         data.save()
+         res = {
+                  'status':True,
+                  'message':'new section created successfully',
+               }
+         return Response(res)
+
+      if request.method == 'DELETE':
+         data = request.data
+         vanamamalai_education.objects.filter(id = data['id']).delete()
+         vanamamalai_education_tab.objects.filter(education_id = data['id']).delete()
+         res = {
+               'status':True,
+               'message':'deleted successfully',
+            }
+         return Response(data)
+
+      if request.method == 'PATCH':
+         data = request.data['data']
+         obj = vanamamalai_education.objects.filter(id = data['id']).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+               'status':True,
+               'message':'status changed successfully',
+            }
+         return Response(res)
+
+
+
+@api_view(['GET','PUT','POST','DELETE','PATCH'])
+def ponnadikkal_jeeyar_edit(request,format=None):
+      page_id = request.GET.get('page_id')
+      if request.method =="GET":
+         obj = ponnadikkal_jeeyar.objects.filter(id = page_id).values().last()
+         tab_obj = list(ponnadikkal_jeeyar_tab.objects.filter(jeeyar_id = page_id)\
+                                                .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['content_title']
+         res['heading'] = obj['content_title']
+         res['subheading'] = obj['content_subtitle']
+         res['content_image'] = obj['content_image']
+         
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         page_id = data['page_id']
+         heading = data['heading']
+         subheading = data['subheading']
+         content_image = data['content_image']
+         ponnadikkal_jeeyar.objects.filter(id = page_id).update(
+                                                                  content_title = heading,
+                                                                  content_subtitle = subheading,
+                                                                  content_image = content_image,
+                                                               )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            ponnadikkal_jeeyar_tab.objects.filter(jeeyar_id = page_id,id = tab_id)\
+                                          .update(
+                                                   tab_heading = tab_name,
+                                                   tab_desc = tab_desc,
+                                                   show_status = tab_show_status,
+                                                 )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+         }
+         return Response(res)
+      
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         
+         data = ponnadikkal_jeeyar_tab(
+                                    jeeyar_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = ponnadikkal_jeeyar_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         ponnadikkal_jeeyar_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
+
+
+
+@api_view(['GET','PUT'])
+def jeeyars_edit(request,format=None):
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      pass
+   else:
+      if request.method == 'GET':
+         res = {}
+         obj = jeeyars.objects.values()
+         res['pageName'] = obj.first()['banner_heading']
+
+         jeeyar_list = obj.annotate(
+                                       sub_page_link = Concat(
+                                                              V('/admin/sub_admin_page/branches_edit/'),
+                                                              Cast('id',CharField()),
+                                                              output_field=CharField()
+                                                            )
+                                   )\
+                           .values('id',
+                                  'name',
+                                  'image',
+                                  'jeeyar_no',
+                                  'start_date',
+                                  'end_date',
+                                  'prefix',
+                                  'show_status',
+                                  'sub_page_link',
+                                  )
+         res['jeeyar_list'] = jeeyar_list
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         page_name = data['pageName']
+         jeeyars.objects.update(
+                                 banner_heading = page_name
+                               )
+         for i in data['jeeyar_list']:
+            obj = jeeyars.objects.filter(id = i['id'])
+            obj.update(
+                        name = i['name'],
+                        image = i['image'],
+                        jeeyar_no = i['jeeyar_no'],
+                        start_date = i['start_date'],
+                        end_date = i['end_date'],
+                        prefix = i['prefix'],
+                        show_status = i['show_status'],
+                      )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull',
+               }
+         return Response(res)
+      
+      if request.method == 'POST':
+         def ordinaltg(n):
+            return str(n) + {1: ' st', 2: ' nd', 3: ' rd'}.get(4 if 10 <= n % 100 < 20 else n % 10, " th")
+         pass
+
+
+
+
 @api_view(['POST'])
 def adminAddNewTabData(request,format=None):
    id = request.data['id']
@@ -489,4 +1210,25 @@ def addImageTabDataAdmin(request,format=None):
          break
 
 
+   return Response(page_data)
+
+
+
+@api_view(['POST'])
+def addImageJeeyarAdmin(request,format=None):
+   file = request.FILES['file']
+   id = int(request.data['id'])
+   page_data = request.data['pageData'].replace('true','True')
+   page_data = page_data.replace('false','False')
+   page_data = eval(page_data)
+
+   img_path = 'img/'
+   upload_res = image_upload(file,img_path)
+   updated_value = 'media/'+upload_res
+
+   for i in page_data['jeeyar_list']:
+      if i['id']  == id:
+         i['image'] = updated_value
+         break
+   print(page_data)
    return Response(page_data)

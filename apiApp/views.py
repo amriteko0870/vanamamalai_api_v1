@@ -29,7 +29,7 @@ from apiApp.models import ponnadikkal_jeeyar,ponnadikkal_jeeyar_tab
 from apiApp.models import vanamamalai_education,vanamamalai_education_tab
 
 #-----------------------------extra -----------------------------------------------------
-from apiApp.extra import navbar_extra_data,other_temple_extra,branches_extra,ponnadikkal_jeeyar_extra
+from apiApp.extra import sample_gallery
 from apiApp.admin_pages.image_upload import image_upload
 
 @api_view(['GET'])
@@ -43,6 +43,8 @@ def landingPage(request,format=None):
     for i in res:
         while '' in i['img']:
             i['img'].remove('')
+    gallery = sample_gallery()
+    res.insert(2,gallery)
     return Response({
                     'message':'True',
                     'data':res
@@ -244,11 +246,10 @@ def other_temple(request,format=None):
     res['content'] = content
     
     tab_data = []
-    jsonDec = json.decoder.JSONDecoder()
     for i in tab:
         tab_content = {}
         tab_content['name'] = i['tab_heading']
-        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+        tab_content['content'] = eval(i['tab_desc'])
 
         tab_data.append(tab_content)
 
@@ -276,11 +277,10 @@ def branches(request,format=None):
     res['content'] = content
     
     tab_data = []
-    jsonDec = json.decoder.JSONDecoder()
     for i in tab:
         tab_content = {}
         tab_content['name'] = i['tab_heading']
-        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+        tab_content['content'] = eval(i['tab_desc'])
 
         tab_data.append(tab_content)
 
@@ -309,11 +309,10 @@ def vn_education(request,format=None):
     res['content'] = content
     
     tab_data = []
-    jsonDec = json.decoder.JSONDecoder()
     for i in tab:
         tab_content = {}
         tab_content['name'] = i['tab_heading']
-        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+        tab_content['content'] = eval(i['tab_desc'])
 
         tab_data.append(tab_content)
 
@@ -340,11 +339,10 @@ def ponnadikkal_jeeyars(request,format=None):
     res['content'] = content
     
     tab_data = []
-    jsonDec = json.decoder.JSONDecoder()
     for i in tab:
         tab_content = {}
         tab_content['name'] = i['tab_heading']
-        tab_content['content'] = jsonDec.decode(i['tab_desc'])
+        tab_content['content'] = eval(i['tab_desc'])
 
         tab_data.append(tab_content)
 

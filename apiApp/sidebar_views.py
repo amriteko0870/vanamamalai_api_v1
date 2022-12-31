@@ -196,8 +196,8 @@ def sideBarAdmin(request,format=None):
     vn_other_temple = {
                  "main_link":{
                               "link_name": "Other Temple",
-                              "link_code": "other_temple_edit"
-
+                              "link_code": "other_temple_edit",
+                              "link_path": "/admin/sub_admin_page/other_temple_edit/"
                              },
                 }
     vn_sub_links = vanamamalai_other_temple.objects.annotate(
@@ -206,7 +206,7 @@ def sideBarAdmin(request,format=None):
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
                                                         sub_link_path = Concat(V('/admin/sub_admin_page/other_temple_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
-    vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    # vn_other_temple['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_other_temple['sub_links'] = vn_sub_links
     navbar.append(vn_other_temple)
 
@@ -214,7 +214,8 @@ def sideBarAdmin(request,format=None):
     vn_branches = {
                  "main_link":{
                               "link_name": "Branches",
-                              "link_code": "branches_edit"
+                              "link_code": "branches_edit",
+                              "link_path": "/admin/sub_admin_page/branches_edit/"
                              },
                 }
     vn_sub_links = vanamamalai_mutt_branches.objects.annotate(
@@ -223,34 +224,16 @@ def sideBarAdmin(request,format=None):
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
                                                         sub_link_path = Concat(V('/admin/sub_admin_page/branches_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
-    vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    # vn_branches['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_branches['sub_links'] = vn_sub_links
     navbar.append(vn_branches)
     
-    pon_jeeyar = {
-                    "main_link": {
-                                    "link_name": "Ponnadikkal Jeeyar",
-                                    "link_path": "/sub_page/ponnadikkal_jeeyar_edit/1",
-                                    "link_code": "ponnadikkal_jeeyar_edit"
-
-                                 },
-                 }
-    navbar.append(pon_jeeyar)           
-    jeeyar = {
-                'main_link': {
-                            'link_name': "Jeeyars",
-                            'link_path': "/jeeyars_edit",
-                            "link_code": "/jeeyars_edit"
-
-                            }
-              }
-    navbar.append(jeeyar)
 
     vn_edu = {
                  "main_link":{
                               "link_name": "Education",
-                              "link_code": "vn_education_edit"
-                              
+                              "link_code": "vn_education_edit",
+                              "link_path": "/admin/sub_admin_page/vn_education_edit/"
                              },
                 }
     vn_sub_links = vanamamalai_education.objects.annotate(
@@ -259,9 +242,33 @@ def sideBarAdmin(request,format=None):
                                                         # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
                                                         sub_link_path = Concat(V('/admin/sub_admin_page/vn_education_edit/'),Cast('id',CharField()),output_field=CharField())
     ).values('id','sub_link_name','sub_link_path','link_code')
-    vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
+    # vn_edu['main_link']['link_path'] = vn_sub_links[0]['sub_link_path'] 
     vn_edu['sub_links'] = vn_sub_links
     navbar.append(vn_edu)
+
+
+    id = str(ponnadikkal_jeeyar.objects.values_list('id',flat=True)[0])
+    pon_jeeyar = {
+                    "main_link": {
+                                    "link_name": "Ponnadikkal Jeeyar",
+                                    "link_path": "admin/sub_admin_page/ponnadikkal_jeeyar_edit/"+id,
+                                    "link_code": "ponnadikkal_jeeyar_edit"
+
+                                 },
+                 }
+    navbar.append(pon_jeeyar) 
+
+
+    jeeyar = {
+                'main_link': {
+                            'link_name': "Jeeyars",
+                            'link_path': "admin/sub_admin_page/jeeyars_edit",
+                            "link_code": "/jeeyars_edit"
+
+                            }
+              }
+    navbar.append(jeeyar)
+
 
     gallery = {
                 'main_link': {
@@ -271,4 +278,4 @@ def sideBarAdmin(request,format=None):
                             }
               }
     navbar.append(gallery)
-    return Response(navbar[:3])
+    return Response(navbar[:8])

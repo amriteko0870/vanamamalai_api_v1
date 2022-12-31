@@ -45,6 +45,7 @@ class vanamamalai_other_temple_tab(models.Model):
     temple_id = models.IntegerField()
     tab_heading = models.TextField()
     tab_desc = models.TextField()
+    show_status = models.BooleanField()
 
 #-----------------------------------------------------------------------------------
 class vanamamalai_mutt_branches(models.Model):
@@ -59,6 +60,7 @@ class vanamamalai_mutt_branches_tab(models.Model):
     branch_id = models.IntegerField()
     tab_heading = models.TextField()
     tab_desc = models.TextField()
+    show_status = models.BooleanField()
 
 #------------------------------------------------------------------------------------
 class ponnadikkal_jeeyar(models.Model):
@@ -73,6 +75,7 @@ class ponnadikkal_jeeyar_tab(models.Model):
     jeeyar_id = models.IntegerField()
     tab_heading = models.TextField()
     tab_desc = models.TextField()
+    show_status = models.BooleanField()
 
 #------------------------------------------------------------------------------------
 class thaniyans_and_vazhi_thirunamams(models.Model):
@@ -91,6 +94,7 @@ class vanamamalai_education_tab(models.Model):
     education_id = models.IntegerField()
     tab_heading = models.TextField()
     tab_desc = models.TextField()
+    show_status = models.BooleanField()
 
 #------------------------------------------------------------------------------------
 class gallery_album(models.Model):
@@ -128,12 +132,14 @@ class jeeyars(models.Model):
     jeeyar_no = models.IntegerField()
     banner_image = models.TextField()
     banner_heading = models.TextField()
+    show_status = models.BooleanField()
 
 
 class jeeyars_tab(models.Model):
     jeeyar_id = models.IntegerField()
     tab_heading = models.TextField()
     tab_desc = models.TextField()
+    show_status = models.BooleanField()
 
 # ------------------------------ Admin ---------------------------
 
