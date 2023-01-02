@@ -123,22 +123,22 @@ class gallery(models.Model):
 
 #---------------------------------------------------------------------
 class jeeyars(models.Model):
-    name = models.TextField()
-    prefix = models.TextField()
-    start_date = models.TextField()
-    end_date = models.TextField()
-    jeeyar_no_suffix = models.TextField()
-    image = models.TextField()
-    jeeyar_no = models.IntegerField()
-    banner_image = models.TextField()
-    banner_heading = models.TextField()
+    name = models.TextField(blank=True)
+    prefix = models.TextField(blank=True)
+    start_date = models.TextField(blank=True)
+    end_date = models.TextField(blank=True)
+    jeeyar_no_suffix = models.TextField(blank=True)
+    image = models.TextField(blank=True)
+    jeeyar_no = models.IntegerField(blank=True,null=True)
+    banner_image = models.TextField(blank=True)
+    banner_heading = models.TextField(blank=True)
     show_status = models.BooleanField()
 
 
 class jeeyars_tab(models.Model):
-    jeeyar_id = models.IntegerField()
-    tab_heading = models.TextField()
-    tab_desc = models.TextField()
+    jeeyar_id = models.IntegerField(blank=True)
+    tab_heading = models.TextField(blank=True)
+    tab_desc = models.TextField(blank=True)
     show_status = models.BooleanField()
 
 # ------------------------------ Admin ---------------------------

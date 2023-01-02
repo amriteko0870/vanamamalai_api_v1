@@ -1022,6 +1022,7 @@ def ponnadikkal_jeeyar_edit(request,format=None):
          res['heading'] = obj['content_title']
          res['subheading'] = obj['content_subtitle']
          res['content_image'] = obj['content_image']
+         res['banner_image'] = obj['banner_image']
          
          c = 1
          for i in tab_obj:
@@ -1039,10 +1040,12 @@ def ponnadikkal_jeeyar_edit(request,format=None):
          heading = data['heading']
          subheading = data['subheading']
          content_image = data['content_image']
+         banner_image = data['banner_image']
          ponnadikkal_jeeyar.objects.filter(id = page_id).update(
                                                                   content_title = heading,
                                                                   content_subtitle = subheading,
                                                                   content_image = content_image,
+                                                                  banner_image = banner_image,
                                                                )
          for i in data['all_tabs']:
             tab_show_status = i['show_status']
@@ -1102,20 +1105,106 @@ def ponnadikkal_jeeyar_edit(request,format=None):
 
 
 
-@api_view(['GET','PUT'])
+@api_view(['GET','PUT','POST','PATCH','DELETE'])
 def jeeyars_edit(request,format=None):
    page_id = request.GET.get('page_id')
    if page_id != None:
-      pass
+      if request.method == 'GET':
+         obj = jeeyars.objects.filter(id = page_id).values().last()
+         tab_obj = list(jeeyars_tab.objects.filter(jeeyar_id = page_id)\
+                                      .annotate(
+                                                            tab_name = F('tab_heading'),
+                                                            tab_id = F('id'),
+                                                            tab_data = F('tab_desc')
+                                                ).values('tab_name','tab_id','tab_data','show_status'))
+         res = {}
+         res['page_id'] = page_id
+         res['pageName'] = obj['banner_heading']
+         res['subPageName'] = obj['name']
+         res['content_image'] = obj['image']
+
+         c = 1
+         for i in tab_obj:
+            i['tab_data'] = eval(i['tab_data'])
+            for j in i['tab_data']:
+               j['id'] = 'bf'+str(c)
+               c = c + 1
+         res['all_tabs'] = tab_obj
+         res['new_id'] = c   
+         return Response(res)
+      
+      if request.method  == 'PUT':
+         data = request.data
+         page_id = data['page_id']
+         content_image = data['content_image']
+         
+         jeeyars.objects.filter(id = page_id).update(
+                                                      image = content_image,
+                                                    )
+         for i in data['all_tabs']:
+            tab_show_status = i['show_status']
+            tab_name = i['tab_name']
+            tab_id = i['tab_id']
+            tab_desc = str(i['tab_data'])
+            jeeyars_tab.objects.filter(jeeyar_id = page_id,id = tab_id)\
+                               .update( 
+                                          tab_heading = tab_name,
+                                          tab_desc = tab_desc,
+                                          show_status = tab_show_status,
+                                       )
+         res = {
+                  'status':True,
+                  'message':'Updation successfull'
+               }
+         return Response(res)
+
+      if request.method == 'POST':
+         page_id = request.data['page_id']
+         data = jeeyars_tab(
+                                    jeeyar_id = page_id,
+                                    tab_heading = 'New Tab',
+                                    tab_desc = "[{'data': 'Lorem ipsum', 'type': 'text'}]",
+                                    show_status = False,
+                               )
+         data.save()
+         res = {
+                  'status': True,
+                  'message': 'new tab created successfully'
+               }
+         return Response(res)
+      
+      if request.method == 'PATCH':
+         tab_id = request.data['data']['tab_id']
+         obj = jeeyars_tab.objects.filter(id = tab_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'tab show status updated successfully',
+               }
+         return Response(res)
+      
+      if request.method == "DELETE":
+         tab_id = request.data['tab_id']
+         jeeyars_tab.objects.filter(id = tab_id).delete()
+         res = {
+                  'status':True,
+                  'message':' tab deleted successfully',
+               }
+         return Response(res)
+
+
    else:
       if request.method == 'GET':
          res = {}
          obj = jeeyars.objects.values()
          res['pageName'] = obj.first()['banner_heading']
-
+         res['banner_image'] = obj.first()['banner_image']
          jeeyar_list = obj.annotate(
                                        sub_page_link = Concat(
-                                                              V('/admin/sub_admin_page/branches_edit/'),
+                                                              V('/admin/sub_admin_page/jeeyars_edit/'),
                                                               Cast('id',CharField()),
                                                               output_field=CharField()
                                                             )
@@ -1136,9 +1225,16 @@ def jeeyars_edit(request,format=None):
       if request.method == 'PUT':
          data = request.data
          page_name = data['pageName']
+         banner_image = data['banner_image']
          jeeyars.objects.update(
-                                 banner_heading = page_name
+                                 banner_heading = page_name,
+                                 banner_image = banner_image,
                                )
+
+         def ordinaltg(n):
+            return {1: 'st', 2: 'nd', 3: 'rd'}.get(4 if 10 <= n % 100 < 20 else n % 10, "th")
+
+
          for i in data['jeeyar_list']:
             obj = jeeyars.objects.filter(id = i['id'])
             obj.update(
@@ -1149,6 +1245,7 @@ def jeeyars_edit(request,format=None):
                         end_date = i['end_date'],
                         prefix = i['prefix'],
                         show_status = i['show_status'],
+                        jeeyar_no_suffix = '' if i['jeeyar_no'] == None else ordinaltg(int(i['jeeyar_no']))
                       )
          res = {
                   'status':True,
@@ -1157,16 +1254,44 @@ def jeeyars_edit(request,format=None):
          return Response(res)
       
       if request.method == 'POST':
-         def ordinaltg(n):
-            return str(n) + {1: ' st', 2: ' nd', 3: ' rd'}.get(4 if 10 <= n % 100 < 20 else n % 10, " th")
-         pass
+         data = jeeyars(
+                           name = 'New Jeeyar',
+                           show_status = False,
+                       )
+         data.save()
+         res = {
+                  'status':True,
+                  'message': 'new jeeyar created successfully'
+               }
+         return Response(res)
 
-
-
+      if request.method == "PATCH":
+         jeeyar_id = request.data['data']['jeeyar_id']
+         obj = jeeyars.objects.filter(id = jeeyar_id).values()
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'jeeyar show status updated successfully',
+               }
+         return Response(res)
+      
+      if request.method == 'DELETE':
+         jeeyar_id = request.data['jeeyar_id']
+         jeeyars.objects.filter(id = jeeyar_id).delete()
+         jeeyars_tab.objects.filter(jeeyar_id = jeeyar_id).delete()
+         res = {
+                  'status' : True,
+                  'message': 'jeeyar deleted successfully',
+               }
+         return Response(res)
+      
 
 @api_view(['POST'])
 def adminAddNewTabData(request,format=None):
-   id = request.data['id']
+   id = int(request.data['id']) + 1
    type1 =request.data['type']
    array = eval(request.data['dataArray'])[0]
    tab_id = eval(request.data['tabId'])[0]
@@ -1180,14 +1305,14 @@ def adminAddNewTabData(request,format=None):
       if i['tab_id'] == tab_id:
          i['tab_data'] = res
          break
-
+   page_data['new_id'] = int(page_data['new_id'])+1
    return Response(page_data)
 
 
 @api_view(['POST'])
 def addImageTabDataAdmin(request,format=None):
    file = request.FILES['file']
-   id = request.data['id']
+   id = int(request.data['id'])+1
    array = eval(request.data['dataArray'])[0]
    tab_id = eval(request.data['tabId'])[0]
 
@@ -1208,8 +1333,8 @@ def addImageTabDataAdmin(request,format=None):
       if i['tab_id'] == tab_id:
          i['tab_data'] = array
          break
-
-
+   page_data['new_id'] = int(page_data['new_id'])+1
+   
    return Response(page_data)
 
 
@@ -1230,5 +1355,4 @@ def addImageJeeyarAdmin(request,format=None):
       if i['id']  == id:
          i['image'] = updated_value
          break
-   print(page_data)
    return Response(page_data)
