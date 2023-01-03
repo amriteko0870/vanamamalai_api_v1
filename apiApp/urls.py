@@ -18,8 +18,8 @@ urlpatterns = [
     path('landingPage',views.landingPage,name='landingPage'),
     path('vn_temple',views.vn_temple,name='vn_temple'),
     path('gallery_page',views.gallery_page,name='gallery_page'),
-    path('sub_album_page',views.sub_album_page,name='sub_album_page'),
-    path('all_sub_album_page',views.all_sub_album_page,name='all_sub_album_page'),
+    # path('sub_album_page',views.sub_album_page,name='sub_album_page'),
+    # path('all_sub_album_page',views.all_sub_album_page,name='all_sub_album_page'),
     path('jeeyars',views.jeeyars_parampara,name='jeeyars_parampara'),
 
     path('other_temple',views.other_temple,name='other_temple'),
@@ -38,6 +38,7 @@ urlpatterns = [
     path('vn_education_edit',admin_views.vn_education_edit,name='vn_education_edit'),
     path('ponnadikkal_jeeyar_edit',admin_views.ponnadikkal_jeeyar_edit,name='ponnadikkal_jeeyar_edit'),
     path('jeeyars_edit',admin_views.jeeyars_edit,name='jeeyars_edit'),
+    path('gallery_edit',admin_views.gallery_edit,name='gallery_edit'),
 
 
     path('adminAddNewTabData',admin_views.adminAddNewTabData,name='adminAddNewTabData'),

@@ -28,7 +28,7 @@ from rest_framework.response import Response
 
 #----------------------------models---------------------------------------------------
 from apiApp.models import landing_page,vanamamalai_temple,vanamamalai_temple_tab
-from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
+from apiApp.models import gallery,gallery_album,gallery_details,gallery_youtube
 from apiApp.models import jeeyars,jeeyars_tab
 from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
 from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_tab
@@ -1288,6 +1288,125 @@ def jeeyars_edit(request,format=None):
                }
          return Response(res)
       
+
+@api_view(['GET','PUT','POST','PATCH','DELETE'])
+def gallery_edit(request,format=None):
+   page_id = request.GET.get('page_id')
+   if page_id != None:
+      obj = gallery_album.objects.filter(id = page_id).values().last()
+      res = {}
+      res['album_name'] = obj['album_name']
+      
+      content_array = gallery.objects.filter(album_id = obj['id']).values('id','image','name','details')
+      res['content_array'] = content_array
+      return Response(res)
+
+   
+   else:
+      if request.method == 'GET':
+         gallery_head = gallery_details.objects.values().last()
+         res = {}
+         res['pageName'] = gallery_head['banner_heading']
+         res['banner_image'] = gallery_head['banner_image']
+
+         yt_links = gallery_youtube.objects.values()
+         res['yt_links'] = yt_links
+
+         albums = gallery_album.objects\
+                               .annotate(
+                                           album_link = Concat(
+                                                                  V('/admin/sub_admin_page/gallery_edit/'),
+                                                                  Cast('id',CharField()),
+                                                                  output_field=CharField()
+                                                               )
+                                        )\
+                               .values()
+         res['albums'] = albums
+         return Response(res)
+      
+      if request.method == 'PUT':
+         data = request.data
+         banner_heading = data['pageName']
+         banner_image = data['banner_image']
+         gallery_details.objects.update( banner_heading = banner_heading,banner_image = banner_image)
+
+         for i in data['yt_links']:
+            gallery_youtube.objects.filter(id = i['id'])\
+                                   .update(
+                                             title = i['title'],
+                                             url = i['url'],
+                                          )
+         
+         for i in data['albums']:
+            gallery_album.objects.filter(id = i['id']).update(album_name = i['album_name'])
+         
+         res = {
+                  'status':True,
+                  'message':'updation successfull'
+               }
+         
+
+         return Response(res)
+
+      if request.method == 'POST':
+         if request.data['type'] == 'y':
+            data = gallery_youtube(
+                                       title = 'new title', 
+                                       url = 'new link',
+                                  )
+            data.save()
+            res = {
+                  'status':True,
+                  'message':'new youtube link created successfull'
+               }
+            return Response(res)
+         if request.data['type'] == 'a':
+            data = gallery_album(
+                                       album_name = 'new album', 
+                                       show_status = False,
+                                  )
+            data.save()
+            res = {
+                  'status':True,
+                  'message':'new youtube link created successfull'
+               }
+            return Response(res)
+
+      if request.method == 'PATCH':
+         album_id = request.data['data']['album_id']
+         obj = gallery_album.objects.filter(id = album_id).values()
+         
+         if obj.last()['show_status']:
+            obj.update(show_status = False)
+         else:
+            obj.update(show_status = True)
+         res = {
+                  'status' : True,
+                  'message': 'album show status updated successfully',
+               }
+         return Response(res)
+      
+      if request.method == 'DELETE':
+         if request.data['type'] == 'y':
+            yt_id = request.data['id']
+            gallery_youtube.objects.filter(id = yt_id).delete()
+            res = {
+                  'status':True,
+                  'message':'youtube link deleted successfull'
+               }
+            return Response(res)
+         if request.data['type'] == 'a':
+            album_id = request.data['id']
+            gallery_album.objects.filter(id = album_id).delete()
+            gallery.objects.filter(album_id = album_id).delete()
+            res = {
+                  'status':True,
+                  'message':'album deleted successfull'
+               }
+            return Response(res)
+         
+
+
 
 @api_view(['POST'])
 def adminAddNewTabData(request,format=None):

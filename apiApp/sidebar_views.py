@@ -26,7 +26,7 @@ from rest_framework.response import Response
 
 #----------------------------models---------------------------------------------------
 from apiApp.models import landing_page,vanamamalai_temple,vanamamalai_temple_tab
-from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
+from apiApp.models import gallery,gallery_album,gallery_details,gallery_youtube
 from apiApp.models import jeeyars,jeeyars_tab
 from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
 from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_tab
@@ -273,7 +273,7 @@ def sideBarAdmin(request,format=None):
     gallery = {
                 'main_link': {
                             'link_name': "Gallery",
-                            'link_path': "/gallery_edit",
+                            'link_path': "admin/sub_admin_page/gallery_edit",
                             "link_code": "/gallery_edit"
                             }
               }

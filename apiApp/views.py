@@ -21,7 +21,7 @@ from rest_framework.response import Response
 
 #----------------------------models---------------------------------------------------
 from apiApp.models import landing_page,vanamamalai_temple,vanamamalai_temple_tab
-from apiApp.models import gallery,gallery_album,gallery_details,gallery_sub_album,gallery_youtube
+from apiApp.models import gallery,gallery_album,gallery_details,gallery_youtube
 from apiApp.models import jeeyars,jeeyars_tab
 from apiApp.models import vanamamalai_other_temple,vanamamalai_other_temple_tab
 from apiApp.models import vanamamalai_mutt_branches,vanamamalai_mutt_branches_tab
@@ -103,18 +103,13 @@ def gallery_page(request,format=None):
     res['carousel_data'] = obj
 
     content = []
-    albums = gallery_album.objects.values_list('album_name','id')
+    albums = gallery_album.objects.filter(show_status = True).values_list('album_name','id')
     for i in albums:
         d = {
               'title' : i[0],
               'id':i[1]
             }
-        content_data = gallery_sub_album.objects.filter(album_name = i[0])\
-                                        .annotate(
-                                                    year = F('sub_album_name'),
-                                                    image = F('sub_album_image')
-                                                 )\
-                                        .values('year','image')
+        content_data = gallery.objects.filter(album_id = i[1]).values('name','image','details')
         d['content_data'] = content_data
 
         content.append(d)
@@ -122,63 +117,63 @@ def gallery_page(request,format=None):
 
     return Response(res)
     
-@api_view(['POST'])
-def sub_album_page(request,format=None):
-    sub_album_name = request.data['sub_album_name']
-    album_id  = request.data['album_id']
-    album_name = gallery_album.objects.filter(id = album_id).values().last()['album_name']
-    res = {}
+# @api_view(['POST'])
+# def sub_album_page(request,format=None):
+#     sub_album_name = request.data['sub_album_name']
+#     album_id  = request.data['album_id']
+#     album_name = gallery_album.objects.filter(id = album_id).values().last()['album_name']
+#     res = {}
 
-    obj = gallery_details.objects.values().last()
-    banner = {
-                "heading": obj['banner_heading'],
-                'image': obj['banner_image'] 
-             }
-    res['banner'] = banner
+#     obj = gallery_details.objects.values().last()
+#     banner = {
+#                 "heading": obj['banner_heading'],
+#                 'image': obj['banner_image'] 
+#              }
+#     res['banner'] = banner
 
-    obj = gallery_sub_album.objects.filter(sub_album_name = sub_album_name,album_name = album_name).values().last()
+#     obj = gallery_sub_album.objects.filter(sub_album_name = sub_album_name,album_name = album_name).values().last()
 
-    res['title'] = obj['sub_album_name']
+#     res['title'] = obj['sub_album_name']
     
-    album_banner = {
-                    'p': obj['sub_album_details'],
-                    'image': obj['sub_album_image']
-                   }
-    res['album_banner'] = album_banner
+#     album_banner = {
+#                     'p': obj['sub_album_details'],
+#                     'image': obj['sub_album_image']
+#                    }
+#     res['album_banner'] = album_banner
 
-    content = gallery.objects.filter(sub_album_name = sub_album_name,album_name = album_name)\
-                             .annotate(
-                                        sub_heading = F('name'),
-                             ).values('sub_heading','image','details')
-    res['content'] = content
-    return Response(res)
+#     content = gallery.objects.filter(sub_album_name = sub_album_name,album_name = album_name)\
+#                              .annotate(
+#                                         sub_heading = F('name'),
+#                              ).values('sub_heading','image','details')
+#     res['content'] = content
+#     return Response(res)
 
-@api_view(['POST'])
-def all_sub_album_page(request,format=None):
-    album_id  = request.data['album_id']
-    album_name = gallery_album.objects.filter(id = album_id).values().last()['album_name']
-    res = {}
+# @api_view(['POST'])
+# def all_sub_album_page(request,format=None):
+#     album_id  = request.data['album_id']
+#     album_name = gallery_album.objects.filter(id = album_id).values().last()['album_name']
+#     res = {}
 
-    obj = gallery_details.objects.values().last()
-    banner = {
-                "heading": obj['banner_heading'],
-                'image': obj['banner_image'] 
-             }
-    res['banner'] = banner
+#     obj = gallery_details.objects.values().last()
+#     banner = {
+#                 "heading": obj['banner_heading'],
+#                 'image': obj['banner_image'] 
+#              }
+#     res['banner'] = banner
 
-    res['title'] = album_name
+#     res['title'] = album_name
 
-    res['id'] = album_id
+#     res['id'] = album_id
 
-    content = gallery_sub_album.objects.filter(album_name = album_name)\
-                                       .annotate(
-                                                 sub_heading = F('sub_album_name'),
-                                                 image = F('sub_album_image')
-                                                ).values('sub_heading','image')
+#     content = gallery_sub_album.objects.filter(album_name = album_name)\
+#                                        .annotate(
+#                                                  sub_heading = F('sub_album_name'),
+#                                                  image = F('sub_album_image')
+#                                                 ).values('sub_heading','image')
 
-    res['content'] = content
+#     res['content'] = content
 
-    return Response(res)
+#     return Response(res)
 
 
 @api_view(['GET'])
