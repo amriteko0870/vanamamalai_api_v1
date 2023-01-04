@@ -271,28 +271,17 @@ def ponnadikkal_jeeyar_extra():
     return d
 
 
+from apiApp.models import gallery_youtube
+from django.db.models import F,Func,Q
 
 def sample_gallery():
     res = {}
     res['background_color'] = "#ffe600"
-    carousel_data = [
-                        {
-                        "video_title": "நோற்ற நோன்பிலேன் - திருவாய்மொழி",
-                        "video_id": "https://youtu.be/cPBReTG66lQ"
-                        },
-                        {
-                        "video_title": "புரட்டாசிக்கும் கன்யா புனர்வசுவுக்கும் உள்ள சிறப்பு",
-                        "video_id": "https://youtu.be/Xi3s58ECG2I"
-                        },
-                        {
-                        "video_title": "ஆழ்வார் ஆசார்யர்கள் உத்ஸவங்கள்  - வானமாமலை",
-                        "video_id": "https://youtu.be/yJK06KlUk28"
-                        },
-                        {
-                        "video_title": "ஸ்ரீமந் நாராயணன், பகவத் ஸ்வரூபத்தில்",
-                        "video_id": "https://youtu.be/xEaq3YQudgQ"
-                        }
-                    ]
+    carousel_data = gallery_youtube.objects.annotate(
+                                            video_title = F('title'),
+                                            video_id = F('url')
+                                        )\
+                               .values('video_title','video_id')
     res['carousel_data'] = carousel_data
     res['layout'] = 'gallery'
     return res

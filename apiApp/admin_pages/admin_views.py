@@ -612,9 +612,10 @@ def other_temple_edit(request,format=None):
          return Response(res)
 
       if request.method == 'POST':
+         obj = vanamamalai_other_temple.objects.values().first()
          data = vanamamalai_other_temple(
-                                       banner_image = '',
-                                       banner_heading = 'Vanamamalai Temple',
+                                       banner_image = obj['banner_image'],
+                                       banner_heading = obj['banner_heading'],
                                        content_title = 'New Section',
                                        content_subtitle = '', 
                                        content_image = '',
@@ -800,9 +801,10 @@ def branches_edit(request,format=None):
          return Response(res)
 
       if request.method == 'POST':
+         obj = vanamamalai_mutt_branches.objects.values().first()
          data = vanamamalai_mutt_branches(
-                                       banner_image = '',
-                                       banner_heading = 'Vanamamalai Temple',
+                                       banner_image = obj['banner_image'],
+                                       banner_heading = obj['banner_heading'],
                                        content_title = 'New Section',
                                        content_subtitle = '', 
                                        content_image = '',
@@ -985,9 +987,10 @@ def vn_education_edit(request,format=None):
          return Response(res)
 
       if request.method == 'POST':
+         obj = vanamamalai_education.objects.values().first()
          data = vanamamalai_education(
-                                       banner_image = '',
-                                       banner_heading = 'Vanamamalai Temple',
+                                       banner_image = obj['banner_image'],
+                                       banner_heading = obj['banner_heading'],
                                        content_title = 'New Section',
                                        content_subtitle = '', 
                                        content_image = '',

@@ -190,7 +190,7 @@ def jeeyars_details(request,format=None):
     id = request.data['id']
     res = {}
     obj = jeeyars.objects.filter(id = id).values().last()
-    tab = jeeyars_tab.objects.filter(jeeyar_id = id).values()
+    tab = jeeyars_tab.objects.filter(jeeyar_id = id,show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],
@@ -263,7 +263,7 @@ def other_temple(request,format=None):
     id = request.data['id']
     res = {}
     obj = vanamamalai_other_temple.objects.filter(id = id).values().last()
-    tab = vanamamalai_other_temple_tab.objects.filter(temple_id = id).values()
+    tab = vanamamalai_other_temple_tab.objects.filter(temple_id = id,show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],
@@ -294,7 +294,7 @@ def branches(request,format=None):
     id = request.data['id']
     res = {}
     obj = vanamamalai_mutt_branches.objects.filter(id = id).values().last()
-    tab = vanamamalai_mutt_branches_tab.objects.filter(branch_id = id).values()
+    tab = vanamamalai_mutt_branches_tab.objects.filter(branch_id = id,show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],
@@ -326,7 +326,7 @@ def vn_education(request,format=None):
     id = request.data['id']
     res = {}
     obj = vanamamalai_education.objects.filter(id = id).values().last()
-    tab = vanamamalai_education_tab.objects.filter(education_id = id).values()
+    tab = vanamamalai_education_tab.objects.filter(education_id = id,show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],
@@ -356,7 +356,7 @@ def vn_education(request,format=None):
 def ponnadikkal_jeeyars(request,format=None):
     res = {}
     obj = ponnadikkal_jeeyar.objects.values().last()
-    tab = ponnadikkal_jeeyar_tab.objects.values()
+    tab = ponnadikkal_jeeyar_tab.objects.filter(show_status = True).values()
 
     banner = {
                 'heading': obj['banner_heading'],

@@ -77,7 +77,7 @@ def sideBar(request,format=None):
 
                                 },
                         }
-        vn_sub_links = vanamamalai_other_temple.objects.annotate(
+        vn_sub_links = vanamamalai_other_temple.objects.filter(show_status = True).annotate(
                                                             link_code = V('other_temple'),
                                                             sub_link_name = F('content_title'),
                                                             # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
@@ -95,7 +95,7 @@ def sideBar(request,format=None):
                                 "link_code": "branches"
                                 },
                     }
-        vn_sub_links = vanamamalai_mutt_branches.objects.annotate(
+        vn_sub_links = vanamamalai_mutt_branches.objects.filter(show_status = True).annotate(
                                                             link_code = V('branches'),
                                                             sub_link_name = F('content_title'),
                                                             # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
@@ -138,7 +138,7 @@ def sideBar(request,format=None):
                                 
                                 },
                     }
-        vn_sub_links = vanamamalai_education.objects.annotate(
+        vn_sub_links = vanamamalai_education.objects.filter(show_status = True).annotate(
                                                             link_code = V('vn_education'),
                                                             sub_link_name = F('content_title'),
                                                             # link_name = Lower(Replace('content_title', V(' '), V('_')),output_field=CharField()),
