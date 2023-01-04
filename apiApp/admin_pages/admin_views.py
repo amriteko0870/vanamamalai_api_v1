@@ -41,79 +41,100 @@ from apiApp.admin_pages.image_upload import image_upload
 from apiApp.admin_pages.layout import layoutCreation,addTab
 #---------------------------------------- start your views -----------------------------------------------
 
-@api_view(['POST'])
+@api_view(['POST','PATCH'])
 def adminDashboard(request,format=None):
-    obj = rootPageStatus.objects.values()
+   if request.method == 'POST':
+      obj = rootPageStatus.objects.values()
 
-    res = {}
-    res['title'] = ["Page title", " Side pages", "Status", "Actions"]
-    data = []   
+      res = {}
+      res['title'] = ["Page title", " Side pages", "Status", "Actions"]
+      data = []   
 
-    home = {
-            'page_name':'Home Page',
-            'page_link':'/admin/home_edit'
-           }
-    data.append(home)
+      home = {
+               'page_name':'Home Page',
+               'page_link':'/admin/home_edit',
+               'status':True
+            }
+      data.append(home)
 
-    vm_temple_data = {
-                        'page_name':'Vanamamalai temple',
-                        'sub_pages':vanamamalai_temple.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Vanamamalai temple').values_list('status',flat=True).last(),
-                        'page_link':'/admin/sub_admin_page/vn_temple_edit/'
-                     }
-    data.append(vm_temple_data)
+      vm_temple_data = {
+                           'id':obj.filter(title__iexact = 'Vanamamalai temple').values_list('id',flat=True).last(),
+                           'page_name':'Vanamamalai temple',
+                           'sub_pages':vanamamalai_temple.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Vanamamalai temple').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/vn_temple_edit/'
+                        }
+      data.append(vm_temple_data)
 
-    other_temple_data = {
-                        'page_name':'Other temple',
-                        'sub_pages':vanamamalai_other_temple.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Other temple').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(other_temple_data) 
+      other_temple_data = {
+                           'id':obj.filter(title__iexact = 'Other temple').values_list('id',flat=True).last(),
+                           'page_name':'Other temple',
+                           'sub_pages':vanamamalai_other_temple.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Other temple').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/other_temple_edit'
+                        }
+      data.append(other_temple_data) 
 
-    branches_data = {
-                        'page_name':'Branches',
-                        'sub_pages':vanamamalai_mutt_branches.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Branches').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(branches_data) 
+      branches_data = {
+                           'id':obj.filter(title__iexact = 'Branches').values_list('id',flat=True).last(),
+                           'page_name':'Branches',
+                           'sub_pages':vanamamalai_mutt_branches.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Branches').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/branches_edit'
+                        }
+      data.append(branches_data) 
 
-    ponnadikkal_jeeyar_data = {
-                        'page_name':'Ponnadikkal Jeeyar',
-                        'sub_pages':ponnadikkal_jeeyar.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Ponnadikkal Jeeyar').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(ponnadikkal_jeeyar_data)   
+      ponnadikkal_jeeyar_data = {
+                           'id':obj.filter(title__iexact = 'Ponnadikkal Jeeyar').values_list('id',flat=True).last(),
+                           'page_name':'Ponnadikkal Jeeyar',
+                           'sub_pages':ponnadikkal_jeeyar.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Ponnadikkal Jeeyar').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/ponnadikkal_jeeyar_edit/'+str(ponnadikkal_jeeyar.objects.values().last()['id'])
+                        }
+      data.append(ponnadikkal_jeeyar_data)   
 
-    jeeyar_data = {
-                        'page_name':'Jeeyars',
-                        'sub_pages':jeeyars.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Jeeyars').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(jeeyar_data)   
-  
-    education_data = {
-                        'page_name':'Education',
-                        'sub_pages':vanamamalai_education.objects.values().count(),
-                        'status':obj.filter(title__iexact = 'Education').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(education_data) 
+      jeeyar_data = {
+                           'id':obj.filter(title__iexact = 'Jeeyars').values_list('id',flat=True).last(),
+                           'page_name':'Jeeyars',
+                           'sub_pages':jeeyars.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Jeeyars').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/jeeyars_edit'
+                        }
+      data.append(jeeyar_data)   
+   
+      education_data = {
+                           'id':obj.filter(title__iexact = 'Education').values_list('id',flat=True).last(),
+                           'page_name':'Education',
+                           'sub_pages':vanamamalai_education.objects.values().count(),
+                           'status':obj.filter(title__iexact = 'Education').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/vn_education_edit'
+                        }
+      data.append(education_data) 
 
-    gallery_data = {
-                        'page_name':'Gallery',
-                        'sub_pages':'1',
-                        'status':obj.filter(title__iexact = 'Gallery').values_list('status',flat=True).last(),
-                        'page_link':'/admin/home_edit'
-                     }
-    data.append(gallery_data)
+      gallery_data = {
+                           'id':obj.filter(title__iexact = 'Gallery').values_list('id',flat=True).last(),
+                           'page_name':'Gallery',
+                           'status':obj.filter(title__iexact = 'Gallery').values_list('show_status',flat=True).last(),
+                           'page_link':'/admin/sub_admin_page/gallery_edit'
+                        }
+      data.append(gallery_data)
 
-    res['all_page_data'] = data[:2]
-    return Response(res)
-    
+      res['all_page_data'] = data
+      return Response(res)
+   
+   if request.method == 'PATCH':
+      root_page_id = request.data['data']['root_page_id']
+      page_status = request.data['data']['page_status']
+      obj = rootPageStatus.objects.filter(id = root_page_id).values()
+      if page_status == 'A':
+         obj.update(show_status = False)
+      if page_status == 'P':
+         obj.update(show_status = True)
+      res = {
+               'status' : True,
+               'message': 'root page show status updated successfully',
+            }
+      return Response(res)
 
 @api_view(['GET','PUT'])
 def home_page(request,format=None):
@@ -1293,13 +1314,61 @@ def jeeyars_edit(request,format=None):
 def gallery_edit(request,format=None):
    page_id = request.GET.get('page_id')
    if page_id != None:
-      obj = gallery_album.objects.filter(id = page_id).values().last()
-      res = {}
-      res['album_name'] = obj['album_name']
+      if request.method == 'GET':
+         obj = gallery_album.objects.filter(id = page_id).values().last()
+         res = {}
+         res['page_id'] = page_id
+         res['album_name'] = obj['album_name']
+         
+         content_array = gallery.objects.filter(album_id = obj['id']).values('id','image','name','details')
+         res['content_array'] = content_array
+         return Response(res)
+   
+      if request.method == 'PUT':
+         data = request.data
+         print(data)
+         page_id = data['page_id']
+         album_name = data['album_name']
+         gallery_album.objects.filter(id = page_id).update(album_name = album_name)
+
+         for i in data['content_array']:
+            gallery.objects.filter(id = i['id']).update(
+                                                         name = i['name'],
+                                                         image = i['image'],
+                                                         details = i['details']
+                                                      )
+         res = {
+                  'status':True,
+                  'message':'updation successfull'
+               }
+         
+
+         return Response(res)
       
-      content_array = gallery.objects.filter(album_id = obj['id']).values('id','image','name','details')
-      res['content_array'] = content_array
-      return Response(res)
+      if request.method == 'POST':
+         data = request.data
+         album_id = data['page_id']
+         data = gallery(
+                           album_id = album_id
+                       )
+         data.save()
+
+         res = {
+                  'status':True,
+                  'message':'new album content created successfully'
+               }
+         return Response(res)
+      
+      if request.method == 'DELETE':
+         data = request.data
+         gallery.objects.filter(id = data['image_id'],album_id = data['album_id']).delete()
+         res = {
+                  'status':True,
+                  'message':'Image deleted successfull'
+               }
+         return Response(res)
+
+
 
    
    else:

@@ -142,4 +142,4 @@ class jeeyars_tab(models.Model):
 
 class rootPageStatus(models.Model):
     title = models.TextField()
-    status = models.TextField()
+    show_status = models.BooleanField()
